@@ -1,0 +1,12 @@
+name = "portfolio-eddy-redbull"
+main = "worker/index.js"
+compatibility_date = "2026-06-13"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "redbull_tracking"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eddy Sallault — Leadership & Operational Case Studies</title>
+  <meta name="description" content="Leadership and operational case studies by Eddy Sallault: building, scaling and improving organizations through field execution, people development and practical systems." />
+  <style>
+    :root {
+      --bg: #f5f2ec;
+      --paper: #fffdf8;
+      --ink: #172033;
+      --muted: #667085;
+      --line: rgba(23, 32, 51, 0.12);
+      --navy: #111827;
+      --blue: #2457a6;
+      --gold: #b88732;
+      --soft-gold: #fbf2df;
+      --radius: 22px;
+      --shadow: 0 22px 60px rgba(17, 24, 39, 0.12);
+      --transition: 220ms ease;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(36, 87, 166, 0.10), transparent 34rem),
+        linear-gradient(180deg, #fbf8f0 0%, var(--bg) 100%);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .page { max-width: 1180px; margin: 0 auto; padding: 34px 24px 80px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:18px; margin-bottom:42px; }
+    .identity { font-weight:900; letter-spacing:-0.04em; font-size:1.1rem; }
+    .toplinks { display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .toplinks a {
+      border:1px solid var(--line); padding:9px 14px; border-radius:999px; font-size:.88rem;
+      color:var(--muted); background:rgba(255,255,255,.55); transition:var(--transition);
+    }
+    .toplinks a:hover { color:var(--ink); background:white; border-color:rgba(36,87,166,.35); }
+    .hero { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr); gap:34px; align-items:stretch; margin-bottom:34px; }
+    .hero-main { background:var(--paper); border:1px solid var(--line); border-radius:34px; padding:clamp(34px,6vw,64px); box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .hero-main::after { content:""; position:absolute; width:360px; height:360px; right:-190px; top:-160px; background:radial-gradient(circle, rgba(184,135,50,.16), transparent 64%); pointer-events:none; }
+    .eyebrow { display:inline-flex; align-items:center; gap:9px; font-size:.82rem; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); font-weight:900; margin-bottom:20px; }
+    .eyebrow::before { content:""; width:36px; height:2px; background:var(--gold); }
+    h1 { font-size:clamp(2.7rem,7vw,5.9rem); line-height:.95; letter-spacing:-.075em; margin-bottom:24px; color:var(--navy); }
+    .hero-text { max-width:760px; font-size:clamp(1.08rem,2vw,1.32rem); color:#354052; margin-bottom:28px; }
+    .hero-pattern { border-left:4px solid var(--gold); padding-left:18px; font-weight:800; color:var(--navy); max-width:720px; font-size:1rem; }
+    .hero-side { display:grid; gap:16px; }
+    .metric-card, .profile-card { border-radius:28px; padding:26px; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+    .metric-card { background:var(--navy); color:white; }
+    .metric-card::after { content:""; position:absolute; inset:auto -80px -80px auto; width:210px; height:210px; border-radius:50%; background:rgba(255,255,255,.07); }
+    .metric-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+    .metric b { display:block; font-size:2rem; line-height:1; letter-spacing:-.06em; }
+    .metric span { display:block; color:rgba(255,255,255,.68); font-size:.82rem; margin-top:6px; }
+    .profile-card { background:white; color:var(--ink); border:1px solid var(--line); }
+    .profile-card h2 { font-size:1.06rem; margin-bottom:12px; letter-spacing:-.02em; }
+    .profile-card p { color:var(--muted); font-size:.95rem; }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:28px; }
+    .cta {
+      min-height:48px; display:inline-flex; align-items:center; justify-content:center; gap:9px;
+      border-radius:999px; border:1px solid var(--line); padding:12px 18px; font-weight:900;
+      background:white; color:var(--ink); transition:var(--transition);
+    }
+    .cta.primary { background:var(--navy); color:white; border-color:var(--navy); }
+    .cta:hover { transform:translateY(-2px); border-color:rgba(36,87,166,.4); box-shadow:0 14px 28px rgba(17,24,39,.1); }
+    .profile-bridge {
+      margin:34px 0 10px; padding:34px; border-radius:34px; color:white; overflow:hidden; position:relative;
+      background:
+        linear-gradient(135deg, rgba(36,87,166,.96), rgba(17,24,39,.98) 48%, rgba(11,31,58,.98));
+      box-shadow:var(--shadow);
+    }
+    .profile-bridge::before {
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+      background-size:58px 58px; opacity:.42;
+    }
+    .profile-bridge > * { position:relative; z-index:1; }
+    .bridge-head { display:flex; justify-content:space-between; align-items:end; gap:24px; margin-bottom:22px; }
+    .bridge-head h2 { font-size:clamp(1.8rem,4vw,3rem); line-height:1; }
+    .bridge-head p { max-width:560px; color:rgba(255,255,255,.72); }
+    .bridge-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+    .bridge-card {
+      border:1px solid rgba(255,255,255,.13); border-radius:24px; padding:22px; min-height:238px;
+      background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.035));
+      display:flex; flex-direction:column; transition:var(--transition);
+    }
+    .bridge-card:hover { transform:translateY(-4px); border-color:rgba(255,204,0,.42); background:rgba(255,255,255,.1); }
+    .bridge-number { color:#f7d78b; font-weight:900; font-size:.82rem; margin-bottom:18px; }
+    .bridge-card h3 { font-size:1.16rem; line-height:1.14; margin-bottom:12px; }
+    .bridge-card p { color:rgba(255,255,255,.72); font-size:.92rem; margin-bottom:16px; }
+    .bridge-tag { margin-top:auto; color:#f7d78b; font-size:.78rem; font-weight:900; text-transform:uppercase; }
+    .bridge-proof { margin-top:16px; color:white; font-weight:900; font-size:.9rem; }
+    .work-profile-cta {
+      margin-top:18px; border:1px solid rgba(255,255,255,.13); border-radius:26px; padding:22px;
+      display:flex; align-items:center; justify-content:space-between; gap:18px; background:rgba(255,255,255,.07);
+    }
+    .work-profile-cta p { color:rgba(255,255,255,.72); max-width:620px; }
+    .work-profile-cta .cta { background:#f7d78b; border-color:#f7d78b; color:#201605; flex-shrink:0; }
+    .consent-banner {
+      position: fixed; left: 20px; right: 20px; bottom: 20px; z-index: 80; display: none;
+      gap: 16px; align-items: center; justify-content: space-between; padding: 18px 20px;
+      background: rgba(17, 24, 39, 0.96); color: white; border-radius: 24px; box-shadow: 0 24px 50px rgba(17, 24, 39, 0.35);
+    }
+    .consent-banner.active { display: flex; }
+    .consent-copy { max-width: 760px; }
+    .consent-copy strong { display: block; font-size: .98rem; margin-bottom: 4px; }
+    .consent-copy p { color: rgba(255,255,255,.72); font-size: .92rem; }
+    .consent-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .consent-button {
+      border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.1); color: white;
+      padding: 11px 16px; border-radius: 999px; font-weight: 800; cursor: pointer; transition: var(--transition);
+    }
+    .consent-button.primary { background: var(--gold); border-color: var(--gold); color: #201605; }
+    .consent-button:hover { transform: translateY(-1px); }
+    .section-intro { display:flex; justify-content:space-between; align-items:end; gap:24px; margin:54px 0 18px; }
+    .section-intro h2 { font-size:clamp(1.7rem,4vw,2.6rem); letter-spacing:-.05em; }
+    .section-intro p { max-width:530px; color:var(--muted); }
+    .filters { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:26px; }
+    .filter {
+      border:1px solid var(--line); background:rgba(255,255,255,.62); padding:10px 14px; border-radius:999px;
+      font-weight:800; font-size:.88rem; color:#485166; cursor:pointer; transition:var(--transition);
+    }
+    .filter:hover, .filter.active { background:var(--navy); color:white; border-color:var(--navy); }
+    .grid { display:grid; grid-template-columns:repeat(12,1fr); gap:18px; }
+    .case-card {
+      grid-column:span 4; min-height: 420px; background:white; border:1px solid var(--line); border-radius:var(--radius);
+      overflow:hidden; box-shadow:0 14px 34px rgba(17,24,39,.07); cursor:pointer; transition:var(--transition);
+      display:flex; flex-direction:column; text-align:left; color:inherit;
+    }
+    .case-card:hover { transform:translateY(-6px); box-shadow:0 24px 48px rgba(17,24,39,.13); }
+    .case-card.featured { grid-column:span 6; }
+    .visual {
+      height:172px; position:relative; background:#d7dee8 center/cover no-repeat; display:flex; align-items:end; padding:18px; color:white; overflow:hidden;
+    }
+    .visual::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(6,10,20,.05), rgba(6,10,20,.74)); }
+    .case-number { position:relative; z-index:1; background:rgba(255,255,255,.18); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.28); border-radius:999px; padding:5px 10px; font-size:.82rem; font-weight:900; }
+    .case-content { padding:22px; flex:1; display:flex; flex-direction:column; }
+    .category { color:var(--blue); font-size:.72rem; font-weight:900; letter-spacing:.11em; text-transform:uppercase; margin-bottom:10px; }
+    .case-card h3 { font-size:1.22rem; line-height:1.16; letter-spacing:-.035em; margin-bottom:10px; }
+    .case-card p { color:var(--muted); font-size:.94rem; margin-bottom:20px; }
+    .case-footer { margin-top:auto; display:flex; justify-content:space-between; gap:12px; align-items:center; color:var(--gold); font-weight:900; font-size:.9rem; }
+    .takeaway { background:var(--soft-gold); border-top:1px solid rgba(184,135,50,.18); padding:12px 22px; font-size:.86rem; color:#7a5a1b; font-weight:800; }
+    .modal { position:fixed; inset:0; background:rgba(12,16,24,.74); backdrop-filter:blur(10px); z-index:50; display:none; align-items:flex-start; justify-content:center; padding:32px 18px; overflow-y:auto; }
+    .modal.active { display:flex; }
+    .article { max-width:920px; width:100%; background:var(--paper); border-radius:30px; border:1px solid rgba(255,255,255,.2); box-shadow:0 40px 90px rgba(0,0,0,.34); overflow:hidden; animation:pop 180ms ease-out; }
+    @keyframes pop { from { opacity:0; transform:translateY(14px) scale(.99); } to { opacity:1; transform:translateY(0) scale(1); } }
+    .article-hero { min-height:360px; background:#d7dee8 center/cover no-repeat; padding:34px; color:white; display:flex; flex-direction:column; justify-content:flex-end; position:relative; }
+    .article-hero::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(5,8,16,.02), rgba(5,8,16,.86)); }
+    .article-hero > * { position:relative; z-index:1; }
+    .article-hero .category { color:#f7d78b; }
+    .article-hero h2 { font-size:clamp(2rem,5vw,3.4rem); line-height:.98; letter-spacing:-.065em; max-width:790px; }
+    .article-hero p { margin-top:14px; max-width:700px; color:rgba(255,255,255,.82); font-size:1.05rem; }
+    .caption { margin-top:16px; color:rgba(255,255,255,.63); font-size:.82rem; }
+    .article-body { padding:34px; display:grid; grid-template-columns:1fr 245px; gap:34px; }
+    .article-main h3 { font-size:1.06rem; text-transform:uppercase; letter-spacing:.1em; color:var(--blue); margin:28px 0 10px; }
+    .article-main h3:first-child { margin-top:0; }
+    .article-main p { color:#30394a; margin-bottom:14px; font-size:1.03rem; }
+    .article-main ul { margin:0 0 18px 22px; color:#30394a; font-size:1.03rem; }
+    .article-main li { margin-bottom:7px; }
+    .article-main blockquote { margin:24px 0; padding:18px 22px; border-left:4px solid var(--gold); background:#fbf2df; border-radius:0 18px 18px 0; font-weight:900; color:#3a2b10; font-size:1.05rem; }
+    .article-side { border-left:1px solid var(--line); padding-left:24px; }
+    .side-box { background:white; border:1px solid var(--line); border-radius:18px; padding:18px; margin-bottom:14px; }
+    .side-box h4 { font-size:.77rem; color:var(--muted); letter-spacing:.11em; text-transform:uppercase; margin-bottom:8px; }
+    .side-box ul { list-style:none; display:grid; gap:8px; color:#354052; font-size:.92rem; }
+    .side-box li::before { content:"— "; color:var(--gold); font-weight:900; }
+    .close { position:fixed; top:20px; right:22px; width:44px; height:44px; border-radius:999px; border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.12); color:white; cursor:pointer; font-size:1.4rem; z-index:60; }
+    .closing { margin:64px 0 0; background:var(--navy); color:white; border-radius:34px; padding:40px; display:grid; grid-template-columns:1fr 1fr; gap:34px; align-items:center; }
+    .closing h2 { font-size:clamp(1.7rem,4vw,3rem); letter-spacing:-.06em; line-height:1; }
+    .pattern-list { display:grid; gap:10px; }
+    .pattern-list div { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.1); border-radius:15px; padding:12px 14px; font-weight:900; }
+    @media (max-width:940px) {
+      .hero { grid-template-columns:1fr; }
+      .case-card, .case-card.featured { grid-column:span 6; }
+      .article-body { grid-template-columns:1fr; }
+      .article-side { border-left:none; padding-left:0; border-top:1px solid var(--line); padding-top:22px; }
+      .closing { grid-template-columns:1fr; }
+      .bridge-head, .work-profile-cta { flex-direction:column; align-items:flex-start; }
+      .bridge-grid { grid-template-columns:repeat(2,1fr); }
+    }
+    @media (max-width:640px) {
+      .page { padding:20px 14px 60px; }
+      .topbar { align-items:flex-start; flex-direction:column; margin-bottom:30px; }
+      .hero-main { padding:28px; border-radius:26px; }
+      .consent-banner { left: 12px; right: 12px; bottom: 12px; border-radius: 20px; padding: 16px; flex-direction: column; align-items: flex-start; }
+      .consent-actions { width: 100%; justify-content: stretch; }
+      .consent-actions button { flex: 1; }
+      .case-card, .case-card.featured { grid-column:1 / -1; }
+      .section-intro { flex-direction:column; align-items:flex-start; }
+      .article-hero, .article-body { padding:24px; }
+      .metric-grid { grid-template-columns:1fr 1fr; }
+      .profile-bridge { padding:24px; border-radius:26px; }
+      .bridge-grid { grid-template-columns:1fr; }
+      .bridge-card { min-height:auto; }
+      .hero-actions .cta, .work-profile-cta .cta { width:100%; }
+    }
+    @media print {
+      body { background:white; }
+      .filters, .toplinks, .modal, .close, .consent-banner { display:none !important; }
+      .case-card { break-inside:avoid; box-shadow:none; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <main class="page">
+    <header class="topbar">
+      <div class="identity">Eddy Sallault</div>
+      <nav class="toplinks">
+        <a href="#cases">Case Studies</a>
+        <a href="work-profile.html">Work Profile</a>
+        <a href="mailto:sallault.eddy@gmail.com">Contact</a>
+        <a href="https://www.linkedin.com/in/eddy-sallault/" target="_blank" rel="noreferrer">LinkedIn</a>
+        <a href="#" onclick="window.print();return false;">Print / PDF</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-main">
+        <div class="eyebrow">Leadership Portfolio</div>
+        <h1>Building. Scaling. Fixing.</h1>
+        <p class="hero-pattern">My operating pattern: start from the field, identify the real problem, challenge assumptions, build a practical solution, make it repeatable, and develop people around the system.</p>
+        <div class="hero-actions">
+          <a class="cta primary" href="#cases">Explore case studies <span>→</span></a>
+          <a class="cta" href="work-profile.html">View work profile <span>→</span></a>
+        </div>
+      </div>
+
+      <aside class="hero-side">
+        <div class="metric-card">
+          <div class="metric-grid">
+            <div class="metric"><b>13</b><span>agencies opened across Southern France</span></div>
+            <div class="metric"><b>€11M</b><span>regional revenue built in two years</span></div>
+            <div class="metric"><b>35</b><span>employees recruited and managed</span></div>
+            <div class="metric"><b>16</b><span>case studies across 6 dimensions</span></div>
+          </div>
+        </div>
+        <div class="profile-card">
+          <h2>Positioning</h2>
+          <p>Senior Operations Leader focused on multi-site management, business growth, process improvement, field execution and practical systems.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="profile-bridge" aria-labelledby="hire-profile-title">
+      <div class="bridge-head">
+        <div>
+          <div class="eyebrow" style="color:#f7d78b">Work temperament</div>
+          <h2 id="hire-profile-title">What happens when you hire this profile?</h2>
+        </div>
+        <p>Across the case studies, the same operating pattern appears: Eddy turns ambiguity into structure, growth into systems, and pressure into focused execution.</p>
+      </div>
+      <div class="bridge-grid">
+        <a class="bridge-card" href="#first-agency">
+          <div class="bridge-number">01 — Ambiguity</div>
+          <h3>In ambiguity, he creates structure.</h3>
+          <p>He starts from the field, separates facts from assumptions, and builds a usable path forward.</p>
+          <div class="bridge-tag">Adaptive</div>
+          <div class="bridge-proof">View proof →</div>
+        </a>
+        <a class="bridge-card" href="#agency-launch-system">
+          <div class="bridge-number">02 — Growth</div>
+          <h3>In growth, he builds repeatable systems.</h3>
+          <p>He does not only chase momentum. He turns what works into training, process and management routines.</p>
+          <div class="bridge-tag">Systems</div>
+          <div class="bridge-proof">View proof →</div>
+        </a>
+        <a class="bridge-card" href="#accountability-without-micro">
+          <div class="bridge-number">03 — Pressure</div>
+          <h3>In pressure, he stays calm, direct and focused.</h3>
+          <p>He communicates clearly, keeps the objective visible, and moves the team toward resolution.</p>
+          <div class="bridge-tag">Confident</div>
+          <div class="bridge-proof">View proof →</div>
+        </a>
+        <a class="bridge-card" href="#fitness-club">
+          <div class="bridge-number">04 — Execution</div>
+          <h3>In execution, he pushes for impact.</h3>
+          <p>He brings energy, commercial drive and ownership to make things happen in real conditions.</p>
+          <div class="bridge-tag">Driven</div>
+          <div class="bridge-proof">View proof →</div>
+        </a>
+      </div>
+      <div class="work-profile-cta">
+        <div>
+          <h3>Explore the work profile behind the results</h3>
+          <p>The case studies show what Eddy has done. The work profile gives a clearer read on how he operates under pressure, ambiguity, growth and change.</p>
+        </div>
+        <a class="cta" href="work-profile.html">View Eddy’s work profile <span>→</span></a>
+      </div>
+    </section>
+
+    <section id="cases">
+      <div class="section-intro">
+        <div>
+          <div class="eyebrow">Selected cases</div>
+          <h2>How I solve operational problems</h2>
+        </div>
+        <p>A practical selection of case studies showing how I approach operational growth, team leadership and process improvement.</p>
+      </div>
+
+      <div class="filters" id="filters">
+        <button class="filter active" data-filter="all">All cases</button>
+        <button class="filter" data-filter="building">Building Organizations</button>
+        <button class="filter" data-filter="talent">Talent & Leadership</button>
+        <button class="filter" data-filter="problem">Problem Solving</button>
+        <button class="filter" data-filter="innovation">Innovation & Process</button>
+        <button class="filter" data-filter="entrepreneurship">Entrepreneurship</button>
+        <button class="filter" data-filter="operations">Operations & CI</button>
+      </div>
+
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <section class="closing">
+      <div>
+        <div class="eyebrow" style="color:#f7d78b">The consistent pattern</div>
+        <h2>I do not start with theory. I start with the field.</h2>
+      </div>
+      <div class="pattern-list">
+        <div>1. Observe what is really happening</div>
+        <div>2. Separate assumptions from facts</div>
+        <div>3. Build a simple, usable solution</div>
+        <div>4. Turn the solution into a repeatable system</div>
+        <div>5. Develop people so the system can scale</div>
+      </div>
+    </section>
+  </main>
+
+  <div class="consent-banner" id="consent-banner" aria-live="polite">
+    <div class="consent-copy">
+      <strong>Accept analytics</strong>
+      <p>This enables anonymous article read tracking. Without acceptance, custom analytics stay disabled.</p>
+    </div>
+    <div class="consent-actions">
+      <button class="consent-button" type="button" id="consent-decline">Decline</button>
+      <button class="consent-button primary" type="button" id="consent-accept">Accept analytics</button>
+    </div>
+  </div>
+
+  <div class="modal" id="modal" aria-hidden="true">
+    <button class="close" id="close" aria-label="Close">×</button>
+    <article class="article" id="article"></article>
+  </div>
+
+  <script>
+    const analyticsConfig = {
+      endpoint: "/api/track",
+      storage: {
+        consent: "eddy-analytics-consent",
+        visitorId: "eddy-visitor-id"
+      },
+      engagedReadSeconds: 20
+    };
+
+    const caseMedia = {
+      "first-agency": { label: "Case 01 - Opening My First Staffing Agency Without Industry Experience", img: "contres st michel.jpg", caption: "Contres, France — industrial and food production environment" },
+      "region-13-agencies": { label: "Case 02 - Scaling a Region from Zero to 13 Agencies", img: "samsic nice.jpg", caption: "SAMSIC Nice — one of the first openings in the PACA expansion" },
+      "agency-launch-system": { label: "Case 03 - Building a Repeatable Agency Launch System", img: "moi et responsable Auxerre en formation.JPG", caption: "Training and onboarding system — from improvisation to repeatable launch process" },
+      "stopped-recruiting-experience": { label: "Case 04 - Why I Stopped Recruiting Only for Experience", img: "entretien solo.gif", caption: "Recruitment — evaluating potential, not only previous job titles" },
+      "assistant-branch-manager": { label: "Case 05 - Turning an Assistant into a Branch Manager", img: "samsic cannes.png", caption: "SAMSIC Cannes — the early team and the future branch manager" },
+      "accountability-without-micro": { label: "Case 06 - Building Accountability Without Micromanagement", img: "siege samsic.avif", caption: "Performance indicators — making activity visible without turning management into surveillance" },
+      "resistance-change": { label: "Case 07 - Leading Through Resistance to Change", img: "entretien.jpeg", caption: "Change leadership — helping people accept a more visible performance culture" },
+      "center-parcs": { label: "Case 08 - Winning Accounts Everyone Else Had Given Up On", img: "center-parcs.jpg", caption: "Center Parcs Sologne — a staffing problem hidden inside a transportation problem" },
+      "beauval-waiter": { label: "Case 09 - Why I Worked as a Waiter and Kitchen Assistant to Solve a Staffing Problem", img: "vue-hotel-pagode-a-beauval.jpg", caption: "ZooParc de Beauval hotels — redefining the profile instead of searching harder" },
+      "assumptions-recruitment": { label: "Case 10 - Challenging Assumptions in Recruitment", img: "entretien.jpeg", caption: "Recruitment process — practical assessment instead of perfect-resume hunting" },
+      "staffing-platform": { label: "Case 11 - Designing a Staffing Platform Before Becoming a Developer", img: "application mobile samsic.png", caption: "SAMSIC digital environment — transforming field frustration into product thinking" },
+      "ceo-digital-solution": { label: "Case 12 - Convincing a CEO to Support a New Digital Solution", img: "siege samsic.avif", caption: "From branch-level idea to group-level digital project" },
+      "fitness-club": { label: "Case 13 - From 280 to 650 Members: The Growth Lesson That Shaped My Management Style", img: "les mills.webp", caption: "Les Mills programs - turning group fitness into a community and acquisition engine" },
+      "training-organization": { label: "Case 14 - Building a Training Organization from Scratch", img: "moi et responsable Auxerre en formation.JPG", caption: "Professional training organization — curriculum, certification and business development" },
+      "us-service-business": { label: "Case 15 - Building a Service Business in the United States", img: "Eddy carpet cleaning.jpg", caption: "Starting over — rebuilding operating principles in a new market" },
+      "thales-traceability": { label: "Case 16 - Improving Logistics Traceability in an Aerospace and Defense Environment", img: "Receiving Incident Control Tower.png", caption: "Scan-based traceability — replacing fragmented logistics visibility with a usable tool" }
+    };
+
+    const cases = [{"id":"first-agency","n":"01","cat":"building","catLabel":"Building Organizations","featured":true,"title":"Opening My First Staffing Agency Without Industry Experience","subtitle":"Starting from zero in a new industry, with no clients, no candidates and no established local operation.","img":"https://www.stmichel.fr/uploads/images/implantation/contres.jpg","caption":"Contres, France — industrial and food production environment","takeaway":"A new industry can be learned fast when the field becomes the classroom.","tags":["Greenfield launch","Commercial execution","Candidate-led selling","Field learning"],"proof":["Agency launched from zero","No initial client portfolio","Candidate-first sales approach"],"body":"\n<h3>Context</h3>\n<p>My first major experience in the staffing industry began when I was recruited as a Branch Manager to open a new SAMSIC staffing agency in Contres, a small town in the Loir-et-Cher region of France.</p>\n<p>I did not come from the staffing industry. I had commercial experience, training experience and a strong understanding of field-based professions, but I had never managed a staffing agency. I had been a temporary worker myself in the past, which gave me awareness of the candidate side, but not the full mechanics of running a staffing branch.</p>\n<h3>The challenge</h3>\n<p>The agency started with no active clients, no candidate database and no established local operation. The obvious accounts were already working with other staffing agencies, and several initially refused to add another provider.</p>\n<h3>What I did</h3>\n<p>I mapped the local market and started with sectors where I could speak credibly. My earlier experience in welding, metal fabrication and manufacturing became a real advantage. When I interviewed a welder, I could ask about TIG, MIG, plan reading, folding machines and production skills. That gave credibility with both candidates and employers.</p>\n<p>I used a candidate-led selling approach. Instead of waiting for job orders, I looked for strong candidates first, then created the opportunity by presenting them directly to companies.</p>\n<blockquote>When you have a strong candidate, you do not wait for the perfect job order. You actively create the opportunity.</blockquote>\n<p>I also prospected early in the morning, when industrial decision-makers were present and less surrounded by the usual sales noise.</p>\n<h3>Outcome</h3>\n<p>The agency gained traction by placing candidates one by one and building trust with employers. That experience became the foundation of my later management philosophy: start from the field, understand the real work, and turn small wins into a repeatable commercial system.</p>\n"},{"id":"region-13-agencies","n":"02","cat":"building","catLabel":"Building Organizations","featured":true,"title":"Scaling a Region from Zero to 13 Agencies","subtitle":"Building a regional staffing network across Southern France where the company had no established presence.","img":"https://www.pagesjaunes.fr/media/newdam/85/33/88/00/00/68/b9/49/3a/c9/623c853388000068b9493ac9/623c853388000068b9493aca.jpg","caption":"SAMSIC Nice — one of the first openings in the PACA expansion","takeaway":"Expansion is not one strategy. It is a sequence of local executions.","tags":["Regional expansion","Multi-site management","Market entry","Local execution"],"proof":["13 agencies opened","€0 to €11M regional revenue","35 employees recruited and managed"],"body":"\n<h3>Context</h3>\n<p>After successfully launching my first agency, I was promoted to Regional Director at SAMSIC with responsibility for developing the PACA region in Southern France. The territory was essentially empty for the staffing division. The initial objective was to open four to five agencies, with more to follow if the model worked.</p>\n<h3>The challenge</h3>\n<p>The first agency was opened in Nice because another SAMSIC business unit already had a local security operation. We expected this internal connection to help us access a strategic airport client. It did not work that way. Even within the same group, the local operation had its own obligations and could not simply open the door for us. It took nearly eighteen months before we placed our first temporary worker there.</p>\n<p>Every market we entered was already competitive. Local staffing firms had existing relationships, candidate pools and client trust. We had to build credibility from scratch.</p>\n<h3>What I did</h3>\n<p>I treated each opening as a local execution problem. Nice, Cannes, Toulon, Marseille, Fos-sur-Mer and the surrounding areas did not have the same labor market, the same sectors or the same relationship dynamics.</p>\n<p>I recruited people who could understand their territory quickly, speak to local companies and build trust. Local knowledge, communication skills and commercial energy were often more important than a perfect staffing resume.</p>\n<blockquote>Expansion is not only a strategy. It is a sequence of local executions.</blockquote>\n<h3>Outcome</h3>\n<p>The region expanded to 13 agencies across Southern France, covering industrial, logistics, maritime, hospitality and service markets. The business grew from zero regional presence to a structured network with significant revenue and team scale.</p>\n"},{"id":"agency-launch-system","n":"03","cat":"building","catLabel":"Building Organizations","title":"Building a Repeatable Agency Launch System","subtitle":"Turning agency openings into a structured operating model instead of relying on improvisation.","img":"https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2020/11/Creer-son-organisme-de-formation-quels-sont-les-avantages-et-demarches.jpeg","caption":"Training and onboarding system — from improvisation to repeatable launch process","takeaway":"Scaling requires systems, not heroes.","tags":["Onboarding","Training design","Standardization","Scaling"],"proof":["Internal training guide","Daily learning modules","Repeatable opening framework"],"body":"\n<h3>Context</h3>\n<p>Opening a staffing agency from scratch means immediate financial pressure: no clients, no candidates, no local reputation and fixed costs from day one. Official group training existed, but new hires were not always able to attend immediately. We needed people productive now, not in several weeks.</p>\n<h3>The challenge</h3>\n<p>If every opening depends on improvisation, growth becomes fragile. I needed a model that could accelerate learning and make performance more consistent across branches.</p>\n<h3>What I did</h3>\n<p>I used my training background to create an internal pre-training process. It included a small training guide, daily topics, practical exercises, short knowledge checks and immediate field application.</p>\n<p>The program covered resume reading, candidate evaluation, commercial routines, competitive watch, job posting analysis, employment law basics and how to turn a good candidate into a placement opportunity.</p>\n<p>I also used group recruitment sessions with practical exercises: presenting another candidate, writing a job ad, analyzing employment law situations and solving realistic agency scenarios.</p>\n<h3>Outcome</h3>\n<p>The method became a repeatable launch model. It allowed me to recruit outside the industry and still make new employees operational quickly. It also created consistency across openings and supported faster progress toward the first profitability thresholds.</p>\n"},{"id":"stopped-recruiting-experience","n":"04","cat":"talent","catLabel":"Talent & Leadership","featured":true,"title":"Why I Stopped Recruiting Only for Experience","subtitle":"How one early hiring decision changed my approach to talent evaluation.","img":"https://infos.emploipublic.fr/mediatheque_edito/3/7/8/000030873_900x500_c.gif","caption":"Recruitment — evaluating potential, not only previous job titles","takeaway":"Experience matters. Potential decides.","tags":["Talent detection","Recruitment","Management decision","Potential"],"proof":["Assistant promoted","Ten placements target achieved","Branch manager development"],"body":"\n<h3>Context</h3>\n<p>During one of the early agency openings, I initially followed the safe strategy: hire someone with staffing industry experience. For Cannes, I recruited an experienced manager and an assistant who did not have the same industry background but showed energy, communication skills and local knowledge.</p>\n<h3>The challenge</h3>\n<p>After several weeks, I noticed a disconnect. The experienced manager described commercial activity, meetings and business development, but the concrete results were weak. When I was present in the agency, I did not see the same level of activity that was being reported.</p>\n<p>At the same time, the assistant was clearly generating value. When I analyzed the placements and real progress, much of it came from her.</p>\n<h3>What I did</h3>\n<p>I ended the manager's probation period. Then I made a different decision: instead of hiring another experienced manager, I challenged the assistant.</p>\n<blockquote>If you generate ten additional full-time placements, I will move you into a commercial role and recruit support around you.</blockquote>\n<h3>Outcome</h3>\n<p>She reached the target within one month, moved into a commercial role and later became Branch Manager. This experience changed the way I evaluated talent. I stopped looking first for the perfect staffing resume and started looking for energy, attitude, learning speed, commercial instinct and initiative.</p>\n"},{"id":"assistant-branch-manager","n":"05","cat":"talent","catLabel":"Talent & Leadership","title":"Turning an Assistant into a Branch Manager","subtitle":"Recognizing performance before the title exists.","img":"https://scontent-mia3-1.xx.fbcdn.net/v/t1.6435-9/53552237_1654481721321712_6700452653127696384_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=lDGroQT9xXwQ7kNvwH5EFJc&_nc_oc=AdqklfI7BVOhSYDCp2NowrYddm1g7o4D5mvYXRQnFuNdcmu7rLTeyCrMVYP4kVAXII4&_nc_zt=23&_nc_ht=scontent-mia3-1.xx&_nc_gid=qG-9UwH0lS-v5CqCHdqSYQ&_nc_ss=7b2a8&oh=00_Af_4_2_frE64uGbpXBzL9q5jMF2C1GzcccRDwIE7aEuUAg&oe=6A48FC24","caption":"SAMSIC Cannes — the early team and the future branch manager","takeaway":"The role can follow the result.","tags":["People development","Internal promotion","Coaching","Performance"],"proof":["Commercial role created","Branch Manager progression","Performance-based promotion"],"body":"\n<h3>Context</h3>\n<p>In one new agency, the person creating the most value did not hold the most senior title. The assistant was not officially the commercial leader, yet she was the one showing energy, relationship skills and real placement results.</p>\n<h3>The challenge</h3>\n<p>I had to decide whether to replace the manager with another external profile or build around the person already demonstrating potential.</p>\n<h3>What I did</h3>\n<p>I created a measurable opportunity. I gave her a clear target and a clear path: if she could generate ten additional placements, she would move into a commercial role and we would recruit support around her.</p>\n<blockquote>Show the result, and the role will follow.</blockquote>\n<h3>Outcome</h3>\n<p>She reached the target in one month. She was promoted, continued to develop and later became Branch Manager. This reinforced a management principle I have kept since: when someone is already doing the work, the title should not be the barrier.</p>\n"},{"id":"accountability-without-micro","n":"06","cat":"talent","catLabel":"Talent & Leadership","title":"Building Accountability Without Micromanagement","subtitle":"Making performance visible across a multi-site organization.","img":"https://www.dynamique-mag.com/wp-content/uploads/0915-sponsor.jpeg","caption":"Performance indicators — making activity visible without turning management into surveillance","takeaway":"If you cannot measure the activity, you cannot understand the weakness.","tags":["KPIs","Multi-site management","Accountability","Performance culture"],"proof":["10 agencies managed","35 employees supervised","Performance indicators implemented"],"body":"\n<h3>Context</h3>\n<p>When I joined ISA as Regional Director, I inherited agencies that were already operating. The previous leader was moving up into a higher role, and I was taking over teams that had not chosen me. That made the transition sensitive.</p>\n<h3>The challenge</h3>\n<p>Some agencies were active and developing. Others appeared stable on paper, but much of the performance came from inherited client portfolios rather than new commercial activity. Without indicators, it was difficult to know whether the issue was skill, process, support or willingness.</p>\n<h3>What I did</h3>\n<p>I introduced simple performance indicators: number of visits, candidate submissions, new clients, quality of candidate pools and daily commercial activity. I explained that the point was not to blame people. The point was to understand where support was needed.</p>\n<p>If there was a weakness, my role was to help fix it. But if nothing was being done, the indicators made that visible too.</p>\n<h3>Outcome</h3>\n<p>For motivated teams, the system created structure and support. For others, it clarified that the role required active development, not only maintenance of an existing portfolio. It helped build a more honest performance culture across the region.</p>\n"},{"id":"resistance-change","n":"07","cat":"talent","catLabel":"Talent & Leadership","title":"Leading Through Resistance to Change","subtitle":"Taking over established teams without triggering unnecessary conflict.","img":"https://infos.emploipublic.fr/mediatheque_edito/3/7/8/000030873_900x500_c.gif","caption":"Change leadership — helping people accept a more visible performance culture","takeaway":"Change is accepted faster when people understand how it helps them win.","tags":["Change leadership","Difficult conversations","Team alignment","Political awareness"],"proof":["Established teams inherited","Indicators accepted","Alignment clarified"],"body":"\n<h3>Context</h3>\n<p>At ISA, I stepped into a role where people already had habits, loyalties and expectations. Some team members were naturally cautious. Others were resistant because new visibility could expose weak commercial activity.</p>\n<h3>The challenge</h3>\n<p>If I pushed too hard, people could reject the change or escalate complaints upward. If I avoided the issue, performance would not improve.</p>\n<h3>What I did</h3>\n<p>I framed performance indicators as a tool for support. More activity, better candidate pools and stronger commercial development helped the agency, the region and the people inside the agency. When necessary, I also had direct conversations about the difference between managing a portfolio and actively developing a business.</p>\n<h3>Outcome</h3>\n<p>Some people engaged with the new logic and improved. Others realized that the environment no longer matched what they wanted. That created clearer alignment and reduced the gap between apparent performance and real contribution.</p>\n"},{"id":"center-parcs","n":"08","cat":"problem","catLabel":"Problem Solving","featured":true,"title":"Winning Accounts Everyone Else Had Given Up On","subtitle":"How understanding the real obstacle helped open an account that initially refused to work with us.","img":"https://www.orleansmetropolis.com/photo/etablissement/11/center-parcs.jpg","caption":"Center Parcs Sologne — a staffing problem hidden inside a transportation problem","takeaway":"The client did not only have a recruitment problem. They had a logistics problem.","tags":["Account opening","Labor shortage","Practical solution","Client development"],"proof":["Initial refusal","Group-based staffing solution","Account opened"],"body":"\n<h3>Context</h3>\n<p>Center Parcs was one of the major local targets near my first agency. They needed staff, but they already worked with staffing providers and initially refused to add another agency.</p>\n<h3>The challenge</h3>\n<p>The real issue was not only recruitment. It was logistics and motivation. The site was about 30 to 45 minutes away, the assignments were often part-time, physically demanding and paid at a low hourly rate. For many candidates, the trip did not make economic sense.</p>\n<h3>What I did</h3>\n<p>When the client eventually called because other providers could not serve an urgent need, I understood that this was the entry point. I provided a candidate quickly, but I also changed the proposition.</p>\n<p>Instead of sending one or two isolated workers, I proposed groups. The workers organized carpooling themselves, and the client committed to taking a minimum number of people at once. That made the assignment more viable for candidates and more reliable for the client.</p>\n<blockquote>The client did not only have a recruitment problem. They had a logistics problem.</blockquote>\n<h3>Outcome</h3>\n<p>The account opened, and the agency was able to take more and more space as a provider. The lesson was simple: sometimes the way to win a client is not to promise harder recruitment, but to remove the practical constraint that prevents people from accepting the work.</p>\n"},{"id":"beauval-waiter","n":"09","cat":"problem","catLabel":"Problem Solving","featured":true,"title":"Why I Worked as a Waiter and Kitchen Assistant to Solve a Staffing Problem","subtitle":"Testing the job myself to understand the real hiring criteria.","img":"https://www.zoo-parc.fr/files/2023/03/vue-hotel-pagode-a-beauval.jpg","caption":"ZooParc de Beauval hotels — redefining the profile instead of searching harder","takeaway":"When the labor pool is exhausted, redefine the profile instead of searching harder for the same person.","tags":["Field immersion","Hospitality staffing","Assumption testing","Client partnership"],"proof":["Assignments tested personally","Criteria redefined","More candidates placed"],"body":"\n<h3>Context</h3>\n<p>ZooParc de Beauval was another major local labor consumer. The park and its hotels needed servers, kitchen assistants, cooks and hospitality staff. But when candidates heard the name, many immediately refused because they had already worked there or had a negative perception of the assignments.</p>\n<h3>The challenge</h3>\n<p>The standard approach was to look for experienced hospitality profiles. But the local pool was limited, and the same profiles had already been overused by the market.</p>\n<h3>What I did</h3>\n<p>I asked the client if I could take the assignments myself. I worked as a server and as a kitchen assistant, not only to observe but to actually help during real needs.</p>\n<p>I wanted to understand exactly what the work required. Serving plates, clearing tables, staying alert, preparing simple kitchen tasks, cutting vegetables, keeping things clean and following instructions were not always tasks that required years of hospitality school. Many required reliability, presentation, attention and willingness to learn.</p>\n<blockquote>When there is a labor shortage, the solution is not always to search harder for the same profile. Sometimes the solution is to redefine the profile.</blockquote>\n<h3>Outcome</h3>\n<p>I worked with the client to broaden the acceptable profile. I selected people carefully for attitude, seriousness and presentation, then asked the client to onboard them step by step. This helped place more candidates and develop the account.</p>\n"},{"id":"assumptions-recruitment","n":"10","cat":"problem","catLabel":"Problem Solving","title":"Challenging Assumptions in Recruitment","subtitle":"Looking at what the job really requires instead of what the job description claims to require.","img":"https://www.dynamique-mag.com/wp-content/uploads/0915-sponsor.jpeg","caption":"Recruitment process — practical assessment instead of perfect-resume hunting","takeaway":"The perfect candidate often does not exist. The right candidate often needs a better definition.","tags":["Competency-based hiring","Assessment","Talent strategy","Practical selection"],"proof":["Practical group assessments","Role decomposition","Potential-based hiring"],"body":"\n<h3>Context</h3>\n<p>Across staffing, I repeatedly saw organizations searching for the perfect candidate: exact title, exact industry, exact experience and exact background. But when I looked at the real daily work, many tasks were narrower and easier to teach than the job description suggested.</p>\n<h3>The challenge</h3>\n<p>By over-defining the ideal profile, companies rejected people who could perform well with proper onboarding. This was especially damaging in tight labor markets.</p>\n<h3>What I did</h3>\n<p>I broke roles down into concrete tasks. What must the person know today? What can be learned quickly? What behaviors are non-negotiable?</p>\n<p>I used practical assessments: presenting another candidate, writing a job ad, reading a resume, analyzing simple employment law cases and solving real agency situations. This helped reveal communication, attention, reasoning and commercial instinct.</p>\n<h3>Outcome</h3>\n<p>The approach reduced dependency on perfect resumes and opened access to stronger potential. It also became part of my broader management philosophy: define the work clearly before defining the candidate.</p>\n"},{"id":"staffing-platform","n":"11","cat":"innovation","catLabel":"Innovation & Process Improvement","featured":true,"title":"Designing a Staffing Platform Before Becoming a Developer","subtitle":"Using a no-code prototype to make an operational problem visible and understandable.","img":"https://www.samsic-emploi.fr/sites/samsic-emploi/files/inline-images/Plan%20de%20travail%201_1.png","caption":"SAMSIC digital environment — transforming field frustration into product thinking","takeaway":"A good prototype makes the problem impossible to ignore.","tags":["Product thinking","No-code prototype","Workflow design","Digital transformation"],"proof":["Interactive Keynote prototype","Candidate workflow mapped","Business process translated into product logic"],"body":"\n<h3>Context</h3>\n<p>While managing a staffing agency, I noticed that the handling of candidate applications was inefficient. We had resumes, candidate information and business needs, but the workflow around receiving, classifying, sending and tracking applications could be much better.</p>\n<h3>The challenge</h3>\n<p>I was not a developer at the time. I was a field manager seeing an operational problem. I needed a way to make the solution visible enough that decision-makers could understand it.</p>\n<h3>What I did</h3>\n<p>I used Apple Keynote to build an interactive prototype with linked slides, screens, buttons and simulated application behavior. It looked and behaved like a digital application: candidate library, application processing, client submission and workflow triggers.</p>\n<blockquote>A good prototype does not need to be technically perfect. It needs to make the future process understandable.</blockquote>\n<h3>Outcome</h3>\n<p>The prototype turned an abstract operational idea into something concrete. It allowed leadership to see what the tool could do, how it would work and why the field needed it.</p>\n"},{"id":"ceo-digital-solution","n":"12","cat":"innovation","catLabel":"Innovation & Process Improvement","title":"Convincing a CEO to Support a New Digital Solution","subtitle":"Turning a field-level idea into a company-level digital project.","img":"https://www.samsic-emploi.fr/sites/samsic-emploi/files/inline-images/Plan%20de%20travail%201_1.png","caption":"From branch-level idea to group-level digital project","takeaway":"Field ideas can become company tools when they are made clear enough.","tags":["Executive influence","Digital project","Cross-functional collaboration","Initiative"],"proof":["Presented to CEO","Connected with IT leadership","Concept retained for development"],"body":"\n<h3>Context</h3>\n<p>After building the prototype, I faced a choice. I could keep it at branch level or take the risk of presenting it to senior leadership.</p>\n<h3>The challenge</h3>\n<p>I was not part of IT. I was not formally responsible for digital tools. Presenting such a project could have been seen as stepping outside my role.</p>\n<h3>What I did</h3>\n<p>At a regional meeting, I presented the prototype directly to the CEO, Thierry Geoffroy. I was nervous, but the prototype made the idea tangible. The response was very positive. He recognized the depth of the work and connected me with IT leadership to continue the project.</p>\n<h3>Outcome</h3>\n<p>The concept was retained and developed into an internal tool. I became involved as a business-side reference point, helping connect field realities with system design.</p>\n"},{"id":"fitness-club","n":"13","cat":"entrepreneurship","catLabel":"Entrepreneurship","title":"From 280 to 650 Members: The Growth Lesson That Shaped My Management Style","subtitle":"Relaunching a fitness club through visible change, Les Mills programs, sales discipline and the cash-flow lesson that shaped how I manage growth.","img":"les mills.webp","caption":"Les Mills programs - turning group fitness into a community and acquisition engine","takeaway":"Growth must be designed, not just created.","tags":["Business relaunch","Les Mills","Sales discipline","Team training"],"proof":["280 to 650 members","Classes grew from 18 to 40+ participants","Referral-based duo offer"],"body":"\n<h3>The situation</h3>\n<p>I was 25 years old when I took over a fitness club in Blois, France.</p>\n<p>The business was not broken. It had around 280 active members, mostly on traditional annual memberships. The club had a real base, regular clients and a stable local presence.</p>\n<p>But it also felt static.</p>\n<p>The activity was balanced, but not dynamic. The equipment was aging. The reception area lacked energy. The locker rooms needed work. The group exercise room had potential, but it was not being used as a real commercial engine.</p>\n<p>I did not want to simply maintain the business. I wanted to relaunch it.</p>\n<p>My first instinct was clear: if I wanted people to believe that something had changed, they had to see and feel that something had changed.</p>\n<h3>The challenge</h3>\n<p>The challenge was not only to attract more members. It was to change the energy of the place.</p>\n<p>I had limited financial resources, so I could not transform everything at once. Every small profit had to be reinvested carefully.</p>\n<p>The real question was:</p>\n<blockquote>How do you create momentum in a business that is functioning, but not growing?</blockquote>\n<p>I decided to work on three levers at the same time:</p>\n<ul>\n<li>The physical environment</li>\n<li>The member experience</li>\n<li>The commercial offer</li>\n</ul>\n<h3>What I changed first</h3>\n<p>I started with visible improvements.</p>\n<p>We repainted the reception area. We improved the locker rooms. We made the space feel clearer, more modern and more welcoming. We reorganized and upgraded what we could with limited means.</p>\n<p>The goal was not luxury. The goal was signal.</p>\n<p>I wanted existing members to feel that the club was moving forward, and I wanted new prospects to immediately understand that this was not the same old gym anymore.</p>\n<h3>The major operational shift: Les Mills</h3>\n<p>The biggest transformation came through group fitness.</p>\n<p>I invested in Les Mills programs and introduced several concepts into the club: RPM, BodyCombat, BodyAttack, BodyPump, BodyJam and BodyStep.</p>\n<p>This was a major decision.</p>\n<p>It required investment, training and adaptation from the instructors. It also changed the identity of the club. Some members initially complained, because the courses became more structured, more intense and more branded.</p>\n<p>But I believed in the direction.</p>\n<p>Les Mills brought energy, consistency, progression, music, marketing power and a stronger sense of community. It also solved a major operational issue for instructors: instead of constantly inventing new classes, they could rely on a professional system, updated every three months.</p>\n<p>I distributed the programs according to each instructor's strengths and preferences. I tried to make the transition realistic by giving each instructor two or three concepts maximum to learn and master.</p>\n<p>This was not just a product change. It was a team transformation.</p>\n<h3>The commercial turning point</h3>\n<p>At the same time, I trained myself.</p>\n<p>I joined a Les Mills sales training program called Supersonic, led at the time by Jean-Philippe Perez. That training changed the way I saw sales.</p>\n<p>It helped me understand that selling was not about forcing someone to buy. It was about removing friction, creating urgency, making the offer easy to understand, and helping people take action.</p>\n<p>That was the moment I discovered something important about myself: I was not only comfortable selling - I was good at it.</p>\n<p>So I changed the way we presented memberships.</p>\n<p>My objective was simple: fill the club.</p>\n<p>I believed that people attract people. A full gym creates energy. A full class creates desire. A full room creates proof.</p>\n<p>So I created a duo offer.</p>\n<p>The idea was simple:</p>\n<blockquote>I will make it easier for you to join, but you need to come with someone.</blockquote>\n<p>This worked because fitness is often social. Many people talk about starting but do not act. I wanted to give them the perfect argument:</p>\n<blockquote>Come with me. If we join together, we get a better price.</blockquote>\n<p>The offer reduced hesitation and created immediate referrals.</p>\n<h3>The result</h3>\n<p>The impact was massive.</p>\n<p>The club grew from around 280 members to approximately 650 members within a few months.</p>\n<p>Group classes changed completely. Sessions that used to gather around 18 people started attracting more than 40.</p>\n<p>The club became alive.</p>\n<p>The atmosphere changed. The rooms were full. The courses had energy. Members talked about the club. The team felt the momentum.</p>\n<p>For a period, the gym became one of the most dynamic fitness clubs in the area.</p>\n<h3>The mistake</h3>\n<p>But growth creates pressure. And I made one major financial mistake.</p>\n<p>Because I wanted zero friction at the point of sale, I accepted payment plans too easily: four payments, eight payments, twelve payments - whatever helped the person sign.</p>\n<p>Commercially, it worked. Financially, it created a cash-flow gap that became extremely difficult to absorb.</p>\n<p>I had generated growth, but I had not protected the financial structure behind that growth.</p>\n<p>That lesson stayed with me.</p>\n<p>Revenue is not cash.<br>Growth is not security.<br>Momentum is not management.</p>\n<p>A business can grow fast and still become fragile if the operating model does not support the commercial strategy.</p>\n<p>Eventually, I had to exit the business and sell the gym to a previous employer, someone I knew from my earlier years as a swimming instructor and aquagym coach.</p>\n<h3>The second lesson: transmission</h3>\n<p>What happened next was just as important as the growth itself.</p>\n<p>After the sale, the new owner also adopted Les Mills programs. I helped with the transition and trained his team in the commercial methods I had learned and applied.</p>\n<p>That moment revealed another part of my professional identity.</p>\n<p>I enjoyed selling.<br>I enjoyed building.<br>But I loved transmitting.</p>\n<p>I loved taking something I had learned, turning it into a practical method, and helping others use it.</p>\n<p>That experience became one of the foundations of my management style.</p>\n<h3>What this case taught me</h3>\n<p>This case shaped me deeply.</p>\n<p>It taught me that energy matters, but structure matters more.</p>\n<p>It taught me that a strong commercial idea can change a business quickly.</p>\n<p>It taught me that training a team is not a cost; it is a growth engine.</p>\n<p>It taught me that customer acquisition must always be connected to cash discipline.</p>\n<p>And it taught me that my strongest contribution is often not only doing things myself, but turning what I learn into something others can repeat.</p>\n<h3>What I would do differently today</h3>\n<p>I would still make the transformation.</p>\n<p>I would still modernize the club.</p>\n<p>I would still invest in the team.</p>\n<p>I would still use group fitness as a community and acquisition engine.</p>\n<p>I would still create a referral-based offer.</p>\n<p>But I would structure the payment model differently.</p>\n<p>I would protect cash flow.</p>\n<p>I would separate commercial flexibility from financial exposure.</p>\n<p>I would build dashboards earlier: signed revenue, collected cash, payment risk, retention, class attendance, instructor load, acquisition source and member lifetime value.</p>\n<p>In other words, I would keep the ambition - but I would build the financial control system around it from day one.</p>\n<h3>Why this case matters</h3>\n<p>This story is important because it shows both sides of growth.</p>\n<p>It shows my ability to enter an existing environment, identify what lacks energy, change the experience, train people, create a commercial offer and generate rapid traction.</p>\n<p>But it also shows the lesson that made me more disciplined later.</p>\n<p>I learned that growth must be designed, not just created.</p>\n<p>That lesson has followed me in every operational project since then.</p>\n<p>Build momentum.<br>Create systems.<br>Train people.<br>Protect cash.<br>Make growth repeatable.</p>\n"},{"id":"training-organization","n":"14","cat":"entrepreneurship","catLabel":"Entrepreneurship","title":"Building a Training Organization from Scratch","subtitle":"Creating a professional training business with compliance, curriculum design and commercial development.","img":"https://www.cadre-dirigeant-magazine.com/wp-content/uploads/2020/11/Creer-son-organisme-de-formation-quels-sont-les-avantages-et-demarches.jpeg","caption":"Professional training organization — curriculum, certification and business development","takeaway":"Training is strongest when people leave with tools they can use immediately.","tags":["Training business","Compliance","Curriculum","Entrepreneurship"],"proof":["Qualiopi certification","Over €100K revenue","18 months"],"body":"\n<h3>Context</h3>\n<p>I founded Ofise Formation, a professional training organization focused on leadership, sales, management and business development.</p>\n<h3>The challenge</h3>\n<p>Building a training organization required more than content creation. It required quality certification, administrative compliance, trainer coordination, client acquisition and curriculum design.</p>\n<h3>What I did</h3>\n<p>I designed training programs, recruited expert trainers and built a structure that met national quality expectations. My focus was always practical: people had to leave with tools they could use immediately.</p>\n<h3>Outcome</h3>\n<p>The organization obtained the required quality certification framework and generated more than €100K in revenue within 18 months.</p>\n"},{"id":"us-service-business","n":"15","cat":"entrepreneurship","catLabel":"Entrepreneurship","title":"Building a Service Business in the United States","subtitle":"Starting over in a new country and building a local field-services company from zero.","img":"https://media.ouest-france.fr/v1/pictures/MjAxMzA5NTljMDllY2FlZjNkYWI0YmZkZDg4YWM2NjlhNGRhNDc?width=1260&height=708&focuspoint=50%2C25&cropresize=1&client_id=bpeditorial&sign=dc1fc5dad29a584879f3ccf24e7179f6b2167ce537a366a95d8c597de8237294","caption":"Starting over — rebuilding operating principles in a new market","takeaway":"Starting over tests whether the operating principles still work in a new market.","tags":["US entrepreneurship","Field services","Customer acquisition","Adaptability"],"proof":["Business built from zero","More than $120K annualized revenue","Strong local reputation"],"body":"\n<h3>Context</h3>\n<p>After relocating to Florida, I founded Florida Eco Services, a residential and commercial field-services company.</p>\n<h3>The challenge</h3>\n<p>Building a business in a new country meant no local brand, no inherited customer base, different market expectations, different acquisition channels and a new operating environment.</p>\n<h3>What I did</h3>\n<p>I managed the full operation: customer acquisition, estimates, pricing, scheduling, quality control, service delivery and reputation management. I also developed digital workflows to improve consistency and customer communication.</p>\n<h3>Outcome</h3>\n<p>The company grew to more than $120K annualized revenue within two years while building a strong local reputation.</p>\n"},{"id":"thales-traceability","n":"16","cat":"operations","catLabel":"Operations & Continuous Improvement","featured":true,"title":"Improving Logistics Traceability in an Aerospace and Defense Environment","subtitle":"Designing and building a scan-based tracking application to replace fragmented parcel visibility.","img":"application mobile samsic.png","caption":"Receiving Incident Control Tower — internal scan workflow interface","takeaway":"If a parcel can move, the system must know who touched it, when, and where it went.","tags":["Traceability","Internal tool","QR scanning","Workflow automation"],"proof":["QR-based zone routing","Search by parcel number","User/date statistics","Cloudflare authentication"],"body":"\n<h3>Context</h3>\n<p>In an aerospace and defense logistics environment, parts and parcels were received every day. The team scanned codes into Excel, which helped count volume but did not provide reliable traceability after reception.</p>\n<p>When a parcel had to be located, people could spend significant time searching because the process did not clearly show where the item had gone, who processed it or whether it had been returned.</p>\n<h3>The challenge</h3>\n<p>The issue was not the absence of effort. The issue was the absence of a traceability system. Excel could record entries, but it could not easily answer the operational question: where is this item now?</p>\n<h3>What I built</h3>\n<p>I designed and coded a scan-based internal tracking application. The system uses QR codes to identify zones, scan parcel or part references, timestamp entries, capture the user, track where the item is routed and manage returns.</p>\n<p>A user can search for a parcel number and immediately see when it entered, who received it and where it was sent. The tool also provides statistics by person, day, week, month or selected date range.</p>\n<p>Authentication was secured through Cloudflare, making the tool reliable and controlled for internal use.</p>\n<h3>Outcome</h3>\n<p>The application is now used internally. It replaced a fragmented visibility process with a practical traceability workflow and made searching for parcels significantly faster and more reliable.</p>\n"}];
+
+    const grid = document.getElementById("grid");
+    const filters = document.getElementById("filters");
+    const modal = document.getElementById("modal");
+    const article = document.getElementById("article");
+    const close = document.getElementById("close");
+    const consentBanner = document.getElementById("consent-banner");
+    const consentAccept = document.getElementById("consent-accept");
+    const consentDecline = document.getElementById("consent-decline");
+
+    let activeCaseId = null;
+    let activeCaseOpenedAt = 0;
+    let engagedReadTimer = null;
+    const pageOpenedAt = Date.now();
+    let pageLeaveTracked = false;
+
+    function readStorage(key, fallback = "") {
+      try { const value = window.localStorage.getItem(key); return value == null ? fallback : value; } catch { return fallback; }
+    }
+
+    function writeStorage(key, value) {
+      try { window.localStorage.setItem(key, value); } catch { /* ignore */ }
+    }
+
+    function getAnalyticsConsent() {
+      return readStorage(analyticsConfig.storage.consent, "pending");
+    }
+
+    function hasAnalyticsConsent() {
+      return getAnalyticsConsent() === "accepted";
+    }
+
+    function getVisitorId() {
+      let visitorId = readStorage(analyticsConfig.storage.visitorId, "");
+      if (!visitorId) {
+        visitorId = (window.crypto && crypto.randomUUID)
+          ? crypto.randomUUID()
+          : `visitor-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        writeStorage(analyticsConfig.storage.visitorId, visitorId);
+      }
+      return visitorId;
+    }
+
+    function updateConsentUI() {
+      const consent = getAnalyticsConsent();
+      consentBanner.classList.toggle("active", consent === "pending");
+    }
+
+    function sendAnalytics(payload) {
+      if (!analyticsConfig.endpoint) {
+        console.info("analytics:event", payload);
+        return;
+      }
+
+      const body = JSON.stringify(payload);
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: "application/json" });
+        navigator.sendBeacon(analyticsConfig.endpoint, blob);
+        return;
+      }
+
+      fetch(analyticsConfig.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+        keepalive: true
+      }).catch(() => {});
+    }
+
+    function trackEvent(eventName, data = {}) {
+      if (!hasAnalyticsConsent()) return;
+      sendAnalytics({
+        event: eventName,
+        data,
+        visitorId: getVisitorId(),
+        page: location.pathname,
+        href: location.href,
+        referrer: document.referrer || "direct",
+        language: navigator.language,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    function setAnalyticsConsent(value) {
+      writeStorage(analyticsConfig.storage.consent, value);
+      updateConsentUI();
+      if (value === "accepted") {
+        trackEvent("analytics_consent_accepted");
+        trackEvent("page_view", { title: document.title });
+      }
+    }
+
+    function trackPageLeave(reason) {
+      if (pageLeaveTracked || !hasAnalyticsConsent()) return;
+      pageLeaveTracked = true;
+      const elapsedSeconds = Math.max(1, Math.round((Date.now() - pageOpenedAt) / 1000));
+      trackEvent("page_left", { title: document.title, reason, elapsedSeconds });
+    }
+
+    function stopActiveReadTracking(reason) {
+      if (engagedReadTimer) {
+        clearTimeout(engagedReadTimer);
+        engagedReadTimer = null;
+      }
+      if (!activeCaseId || !activeCaseOpenedAt) return;
+
+      const elapsedSeconds = Math.max(1, Math.round((Date.now() - activeCaseOpenedAt) / 1000));
+      trackEvent("case_closed", { id: activeCaseId, reason, elapsedSeconds });
+      activeCaseId = null;
+      activeCaseOpenedAt = 0;
+    }
+
+    function startActiveReadTracking(c) {
+      stopActiveReadTracking("switched");
+      activeCaseId = c.id;
+      activeCaseOpenedAt = Date.now();
+      engagedReadTimer = window.setTimeout(() => {
+        trackEvent("case_engaged_read", {
+          id: c.id,
+          title: c.title,
+          elapsedSeconds: analyticsConfig.engagedReadSeconds
+        });
+      }, analyticsConfig.engagedReadSeconds * 1000);
+    }
+
+    function escapeAttr(value) {
+      return String(value || "").replace(/"/g, "&quot;");
+    }
+
+    function getCaseMedia(c) {
+      return caseMedia[c.id] || { img: "", caption: "" };
+    }
+
+    function render(filter = "all") {
+      grid.innerHTML = "";
+      cases
+        .filter(c => filter === "all" || c.cat === filter)
+        .forEach(c => {
+          const card = document.createElement("button");
+          card.className = "case-card" + (c.featured ? " featured" : "");
+          card.setAttribute("data-id", c.id);
+          const media = getCaseMedia(c);
+          const bg = media.img ? `background-image:url("${escapeAttr(media.img)}")` : "";
+          card.innerHTML = `
+            <div class="visual" style='${bg}'>
+              <span class="case-number">Case ${c.n}</span>
+            </div>
+            <div class="case-content">
+              <div class="category">${c.catLabel}</div>
+              <h3>${c.title}</h3>
+              <p>${c.subtitle}</p>
+              <div class="case-footer"><span>Read case</span><span>→</span></div>
+            </div>
+            <div class="takeaway">${c.takeaway}</div>
+          `;
+          grid.appendChild(card);
+        });
+    }
+
+    function openCase(id) {
+      const c = cases.find(item => item.id === id);
+      if (!c) return;
+      trackEvent("case_opened", { id: c.id, title: c.title, category: c.cat });
+      startActiveReadTracking(c);
+      const media = getCaseMedia(c);
+      const bg = media.img ? `background-image:url("${escapeAttr(media.img)}")` : "";
+      article.innerHTML = `
+        <header class="article-hero" style='${bg}'>
+          <div class="category">${c.catLabel} · Case ${c.n}</div>
+          <h2>${c.title}</h2>
+          <p>${c.subtitle}</p>
+          <div class="caption">${media.caption || ""}</div>
+        </header>
+        <div class="article-body">
+          <div class="article-main">${c.body}</div>
+          <aside class="article-side">
+            <div class="side-box">
+              <h4>Takeaway</h4>
+              <p style="color:#172033;font-weight:900;margin:0">${c.takeaway}</p>
+            </div>
+            <div class="side-box">
+              <h4>Demonstrates</h4>
+              <ul>${c.tags.map(t => `<li>${t}</li>`).join("")}</ul>
+            </div>
+            <div class="side-box">
+              <h4>Evidence</h4>
+              <ul>${c.proof.map(p => `<li>${p}</li>`).join("")}</ul>
+            </div>
+          </aside>
+        </div>
+      `;
+      modal.classList.add("active");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      history.replaceState(null, "", "#" + id);
+    }
+
+    function closeModal() {
+      stopActiveReadTracking("closed");
+      modal.classList.remove("active");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      if (location.hash) history.replaceState(null, "", location.pathname);
+    }
+
+    render();
+    updateConsentUI();
+
+    filters.addEventListener("click", e => {
+      const button = e.target.closest(".filter");
+      if (!button) return;
+      filters.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
+      button.classList.add("active");
+      trackEvent("filter_selected", { filter: button.dataset.filter });
+      render(button.dataset.filter);
+    });
+
+    grid.addEventListener("click", e => {
+      const card = e.target.closest(".case-card");
+      if (card) openCase(card.dataset.id);
+    });
+
+    close.addEventListener("click", closeModal);
+    modal.addEventListener("click", e => {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") closeModal();
+    });
+
+    consentAccept.addEventListener("click", () => setAnalyticsConsent("accepted"));
+    consentDecline.addEventListener("click", () => setAnalyticsConsent("declined"));
+
+    document.addEventListener("click", e => {
+      const link = e.target.closest("a");
+      if (!link) return;
+      const href = link.getAttribute("href") || "";
+      if (link.closest(".profile-bridge") && href.startsWith("#")) {
+        const id = href.replace("#", "");
+        if (cases.some(c => c.id === id)) {
+          e.preventDefault();
+          trackEvent("profile_proof_click", { id });
+          openCase(id);
+          return;
+        }
+      }
+      if (href.includes("work-profile.html")) trackEvent("work_profile_click", { href });
+      if (href.startsWith("mailto:")) trackEvent("contact_click", { href });
+      else if (href.includes("linkedin.com")) trackEvent("linkedin_click", { href });
+      else if (href === "#" && link.textContent.includes("Print")) trackEvent("print_click", { href: "print" });
+    });
+
+    window.addEventListener("pagehide", () => {
+      stopActiveReadTracking("page_left");
+      trackPageLeave("pagehide");
+    });
+
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      setTimeout(() => openCase(id), 250);
+    } else if (hasAnalyticsConsent()) {
+      trackEvent("page_view", { title: document.title });
+    }
+  </script>
+</body>
+</html>
