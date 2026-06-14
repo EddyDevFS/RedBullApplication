@@ -297,6 +297,32 @@ GET /admin
 
 Dashboard protégé par login.
 
+POST /admin
+
+Crée un destinataire et un lien tracké personnalisé.
+
+Champs :
+
+{
+  "first_name": "Alex",
+  "last_name": "Recruiter",
+  "email": "alex@redbull.com",
+  "role": "Talent Acquisition",
+  "company": "Red Bull"
+}
+
+Résultat :
+
+* création / insertion dans contacts ;
+* création d’un token unique dans links ;
+* affichage d’un lien copiable :
+
+https://portfolio-eddy.sallault-eddy.workers.dev/r/RB-7K2P9
+
+Toutes les sessions ouvertes depuis ce lien sont rattachées à ce contact.
+Si ce contact génère ensuite un lien de transfert, le lien enfant garde parent_token,
+ce qui permet de voir dans l’admin de quel destinataire vient l’invitation.
+
 Solution simple au départ :
 
 * Basic Auth via Cloudflare Worker ;
