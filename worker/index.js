@@ -276,6 +276,17 @@ async function handleAdmin(request, env) {
 
   if (request.method === "POST") {
     generatedLink = await createRecipientLink(request, env);
+    return Response.redirect(`${new URL(request.url).origin}/admin?created=${encodeURIComponent(generatedLink.token)}`, 303);
+  }
+
+  const createdToken = new URL(request.url).searchParams.get("created");
+  if (createdToken) {
+    generatedLink = await env.DB.prepare(
+      `SELECT l.token, c.name, c.role, c.email
+       FROM links l
+       LEFT JOIN contacts c ON c.id = l.contact_id
+       WHERE l.token = ?`,
+    ).bind(createdToken).first();
   }
 
   const [totals, recentSessions, topEvents, links, messages] = await Promise.all([
