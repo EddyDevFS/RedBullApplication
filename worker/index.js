@@ -8,12 +8,12 @@ const ADMIN_CSS = `
 body{margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#f6f8fb;color:#08111f}
 main{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:40px 0}
 h1{margin:0 0 8px;font-size:clamp(2rem,5vw,4rem);line-height:.95}
-p{color:#5d6b7c}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:28px 0}
+p{color:#5d6b7c}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:28px 0}a{color:#0f4ea8;font-weight:800;text-decoration:none}a:hover{text-decoration:underline}
 .card,table,.admin-form,.generated-link{background:white;border:1px solid rgba(8,17,31,.1);border-radius:8px;box-shadow:0 12px 32px rgba(8,17,31,.08)}
 .card{padding:18px}.card strong{display:block;font-size:2rem}.card span{color:#5d6b7c;font-weight:700}
 table{width:100%;border-collapse:collapse;overflow:hidden}th,td{padding:12px;border-bottom:1px solid rgba(8,17,31,.08);text-align:left;font-size:.9rem;vertical-align:top}
 th{background:#08111f;color:white}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-.admin-form{display:grid;gap:14px;margin:28px 0;padding:18px}.admin-form h2{margin:0}.admin-form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.admin-form label{display:grid;gap:6px;color:#082b66;font-size:.74rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.admin-form input{min-height:42px;padding:9px 11px;border:1px solid rgba(8,17,31,.14);border-radius:6px;font:inherit}.admin-form button{min-height:42px;align-self:end;border:0;border-radius:999px;background:#082b66;color:white;font-weight:900;cursor:pointer}.generated-link{padding:14px 16px;margin:14px 0;background:#eef8f2;border-color:rgba(16,166,106,.28)}.generated-link input{width:100%;margin-top:8px;padding:10px;border:1px solid rgba(16,166,106,.35);border-radius:6px;font:inherit}
+.admin-form{display:grid;gap:14px;margin:28px 0;padding:18px}.admin-form h2{margin:0}.admin-form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.admin-form label{display:grid;gap:6px;color:#082b66;font-size:.74rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.admin-form input{min-height:42px;padding:9px 11px;border:1px solid rgba(8,17,31,.14);border-radius:6px;font:inherit}.admin-form button{min-height:42px;align-self:end;border:0;border-radius:999px;background:#082b66;color:white;font-weight:900;cursor:pointer}.generated-link{padding:14px 16px;margin:14px 0;background:#eef8f2;border-color:rgba(16,166,106,.28)}.generated-link input{width:100%;margin-top:8px;padding:10px;border:1px solid rgba(16,166,106,.35);border-radius:6px;font:inherit}.timeline{display:grid;gap:10px}.timeline-item{padding:14px 16px;background:white;border:1px solid rgba(8,17,31,.1);border-radius:8px;box-shadow:0 8px 24px rgba(8,17,31,.06)}.timeline-item strong{display:block}.timeline-item small{color:#5d6b7c}.timeline-item pre{white-space:pre-wrap;word-break:break-word;background:#f6f8fb;border-radius:6px;padding:10px;max-height:220px;overflow:auto}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2f7;color:#082b66;font-size:.74rem;font-weight:900}
 @media(max-width:760px){.grid{grid-template-columns:1fr 1fr}table{display:block;overflow-x:auto}}
 `;
 
@@ -23,6 +23,10 @@ export default {
 
     if (url.pathname.startsWith("/api/")) {
       return handleApi(request, env, url);
+    }
+
+    if (url.pathname === "/admin/session") {
+      return handleAdminSession(request, env, url);
     }
 
     if (url.pathname === "/admin") {
@@ -284,6 +288,13 @@ async function handleAdmin(request, env) {
     ).first(),
     env.DB.prepare(
       `SELECT s.token, l.parent_token, c.name, c.role, c.email, pc.name AS parent_name,
+        COALESCE(c.name,
+          (SELECT TRIM(COALESCE(json_extract(e.event_data, '$.firstName'), '') || ' ' || COALESCE(json_extract(e.event_data, '$.lastName'), ''))
+           FROM events e
+           WHERE e.session_id = s.session_id AND e.event_type = 'visitor_identified'
+           ORDER BY e.created_at DESC LIMIT 1),
+          'Anonymous visitor'
+        ) AS visitor,
         s.session_id, s.started_at, s.last_seen_at,
         s.active_time_seconds, s.page_views, s.device_type, s.browser, s.os, s.country, s.region, s.referrer
        FROM sessions s
@@ -291,6 +302,7 @@ async function handleAdmin(request, env) {
        LEFT JOIN contacts c ON c.id = l.contact_id
        LEFT JOIN links pl ON pl.token = l.parent_token
        LEFT JOIN contacts pc ON pc.id = pl.contact_id
+       WHERE datetime(s.started_at) >= datetime('now', '-15 days')
        ORDER BY s.started_at DESC
        LIMIT 30`,
     ).all(),
@@ -355,11 +367,64 @@ function renderAdmin(totals, sessions, topEvents, links, messages, generatedLink
       <div class="card"><strong>${totals.events}</strong><span>Events</span></div>
       <div class="card"><strong>${Math.round(totals.active_seconds / 60)}</strong><span>Active minutes</span></div>
     </section>
-    <h2>Recent sessions</h2>${table(sessions, ["token","name","role","email","parent_token","parent_name","started_at","last_seen_at","active_time_seconds","device_type","browser","os","country","region"])}
+    <h2>Connection journal - last 15 days</h2>${connectionsTable(sessions)}
     <h2>Messages & appointments</h2>${table(messages, ["type","first_name","last_name","email","title","message","token","created_at"])}
     <h2>Top events</h2>${table(topEvents, ["event_type","count"])}
     <h2>Links</h2>${table(links, ["token","name","company","role","email","parent_token","parent_name","campaign","status","last_opened_at"])}
   </main></body></html>`;
+}
+
+async function handleAdminSession(request, env, url) {
+  const unauthorized = requireAdmin(request, env);
+  if (unauthorized) return unauthorized;
+
+  const sessionId = url.searchParams.get("session_id");
+  if (!sessionId) return html(renderAdminShell("<h1>Missing session_id</h1><p><a href=\"/admin\">Back to admin</a></p>"));
+
+  const session = await env.DB.prepare(
+    `SELECT s.*, l.parent_token, c.name, c.company, c.role, c.email, pc.name AS parent_name
+     FROM sessions s
+     LEFT JOIN links l ON l.token = s.token
+     LEFT JOIN contacts c ON c.id = l.contact_id
+     LEFT JOIN links pl ON pl.token = l.parent_token
+     LEFT JOIN contacts pc ON pc.id = pl.contact_id
+     WHERE s.session_id = ?`,
+  ).bind(sessionId).first();
+
+  if (!session) return html(renderAdminShell("<h1>Session not found</h1><p><a href=\"/admin\">Back to admin</a></p>"));
+
+  const events = (await env.DB.prepare(
+    `SELECT event_type, section_id, event_data, created_at
+     FROM events
+     WHERE session_id = ? OR (session_id IS NULL AND token = ?)
+     ORDER BY created_at ASC`,
+  ).bind(sessionId, session.token).all()).results;
+
+  const visitor = visitorLabel(session, events);
+  const summary = summarizeEvents(events);
+
+  return html(renderAdminShell(`
+    <p><a href="/admin">Back to admin</a></p>
+    <h1>${escapeHtml(visitor)}</h1>
+    <p>
+      <span class="badge">${escapeHtml(session.token)}</span>
+      ${session.parent_name ? `<span class="badge">Invited by ${escapeHtml(session.parent_name)}</span>` : ""}
+      <span class="badge">${escapeHtml(session.device_type ?? "unknown device")}</span>
+      <span class="badge">${escapeHtml([session.country, session.region].filter(Boolean).join(" / ") || "unknown location")}</span>
+    </p>
+    <section class="grid">
+      <div class="card"><strong>${Math.round((session.active_time_seconds ?? 0) / 60)}</strong><span>Active minutes</span></div>
+      <div class="card"><strong>${summary.sections.length}</strong><span>Sections viewed</span></div>
+      <div class="card"><strong>${summary.articles}</strong><span>Articles opened</span></div>
+      <div class="card"><strong>${summary.clicks}</strong><span>Clicks / actions</span></div>
+    </section>
+    <h2>Visitor profile</h2>
+    ${table([session], ["session_id","name","role","email","parent_token","parent_name","started_at","last_seen_at","browser","os","referrer"])}
+    <h2>Sections viewed</h2>
+    ${summary.sections.length ? table(summary.sections.map((section) => ({ section })), ["section"]) : "<p>No section view recorded yet.</p>"}
+    <h2>Complete behavior timeline</h2>
+    <div class="timeline">${events.map(renderTimelineEvent).join("") || "<p>No event recorded yet.</p>"}</div>
+  `));
 }
 
 function renderGeneratedLink(link, origin) {
@@ -384,6 +449,116 @@ function renderCreateRecipientForm() {
       <button type="submit">Generate link</button>
     </div>
   </form>`;
+}
+
+function renderAdminShell(content) {
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Red Bull Tracking Admin</title><style>${ADMIN_CSS}</style></head><body><main>${content}</main></body></html>`;
+}
+
+function connectionsTable(rows) {
+  return `<table><thead><tr>${["visitor","token","origin","started_at","last_seen_at","active_time_seconds","device_type","browser","country","region"].map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${rows
+    .map((row) => {
+      const visitor = row.visitor?.trim() || row.name || "Anonymous visitor";
+      const origin = row.parent_name ? `Invited by ${row.parent_name}` : row.parent_token ? `Invited by ${row.parent_token}` : "Direct tracked link";
+      return `<tr>
+        <td><a href="/admin/session?session_id=${encodeURIComponent(row.session_id)}">${escapeHtml(visitor)}</a></td>
+        <td><code>${escapeHtml(row.token ?? "")}</code></td>
+        <td>${escapeHtml(origin)}</td>
+        <td>${escapeHtml(row.started_at ?? "")}</td>
+        <td>${escapeHtml(row.last_seen_at ?? "")}</td>
+        <td>${escapeHtml(row.active_time_seconds ?? 0)}s</td>
+        <td>${escapeHtml(row.device_type ?? "")}</td>
+        <td>${escapeHtml(row.browser ?? "")}</td>
+        <td>${escapeHtml(row.country ?? "")}</td>
+        <td>${escapeHtml(row.region ?? "")}</td>
+      </tr>`;
+    })
+    .join("")}</tbody></table>`;
+}
+
+function visitorLabel(session, events) {
+  if (session.name) return session.name;
+  const identified = [...events].reverse().find((event) => event.event_type === "visitor_identified");
+  if (identified) {
+    const data = parseEventData(identified.event_data);
+    const name = [data.firstName, data.lastName].filter(Boolean).join(" ").trim();
+    if (name) return name;
+  }
+  return "Anonymous visitor";
+}
+
+function summarizeEvents(events) {
+  const sections = new Set();
+  let articles = 0;
+  let clicks = 0;
+
+  events.forEach((event) => {
+    const data = parseEventData(event.event_data);
+    if (event.event_type === "section_view") sections.add(data.sectionTitle || data.sectionId || event.section_id);
+    if (event.event_type === "case_article_open") articles += 1;
+    if (
+      event.event_type.includes("click") ||
+      event.event_type === "cta_click" ||
+      event.event_type === "document_download" ||
+      event.event_type === "appointment_request" ||
+      event.event_type === "message_sent" ||
+      event.event_type === "share_link_generated"
+    ) {
+      clicks += 1;
+    }
+  });
+
+  return {
+    sections: [...sections].filter(Boolean),
+    articles,
+    clicks,
+  };
+}
+
+function renderTimelineEvent(event) {
+  const data = parseEventData(event.event_data);
+  const label = eventLabel(event.event_type, data, event.section_id);
+  return `<article class="timeline-item">
+    <small>${escapeHtml(event.created_at ?? "")}</small>
+    <strong>${escapeHtml(label)}</strong>
+    <span class="badge">${escapeHtml(event.event_type)}</span>
+    ${event.section_id ? `<span class="badge">${escapeHtml(event.section_id)}</span>` : ""}
+    <pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre>
+  </article>`;
+}
+
+function eventLabel(type, data, sectionId) {
+  if (type === "page_view") return `Opened candidate file`;
+  if (type === "section_view") return `Viewed section: ${data.sectionTitle || data.sectionId || sectionId || "unknown"}`;
+  if (type === "scroll_depth") return `Scrolled to ${data.depth}%`;
+  if (type === "case_file_open") return `Opened case file: ${data.caseTitle || data.caseId || "unknown"}`;
+  if (type === "case_article_open") return `Opened full article: ${data.articleTitle || data.caseId || "unknown"}`;
+  if (type === "proof_validated") return `Validated proof: ${data.requirement || data.proofId || "unknown"}`;
+  if (type === "gap_file_open") return `Opened gap file: ${data.title || data.flagId || "unknown"}`;
+  if (type === "gap_control_marked") return `Marked gap controlled: ${data.flagId || "unknown"}`;
+  if (type === "document_click") return `Clicked document: ${data.documentId || data.label || "unknown"}`;
+  if (type === "document_download") return `Downloaded document: ${data.documentId || "unknown"}`;
+  if (type === "linkedin_click") return `Clicked LinkedIn`;
+  if (type === "email_click") return `Clicked email action: ${data.label || "email"}`;
+  if (type === "cta_click") return `Clicked CTA: ${data.label || data.ctaId || "unknown"}`;
+  if (type === "share_link_generated") return `Generated or opened shared invite link`;
+  if (type === "visitor_identified") return `Visitor identified: ${[data.firstName, data.lastName].filter(Boolean).join(" ")}`;
+  if (type === "visitor_anonymous") return `Visitor chose anonymous mode`;
+  if (type === "appointment_request") return `Sent appointment request`;
+  if (type === "message_sent") return `Sent message`;
+  if (type === "no_fit_today") return `Marked no fit today`;
+  if (type === "return_visit") return `Returned visit`;
+  if (type === "heartbeat") return `Active heartbeat`;
+  if (type === "exit") return `Exited page`;
+  return type;
+}
+
+function parseEventData(value) {
+  try {
+    return value ? JSON.parse(value) : {};
+  } catch {
+    return {};
+  }
 }
 
 function table(rows, columns) {
