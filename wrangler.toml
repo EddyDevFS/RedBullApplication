@@ -9,4 +9,4 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "redbull_tracking"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "6e6064d2-ddfb-4ca1-84e4-f214ac07e63c"
