@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "db:apply": "npx wrangler d1 execute redbull_tracking --file db/schema.sql",
+    "db:apply:remote": "npx wrangler d1 execute redbull_tracking --remote --file db/schema.sql",
     "deploy": "npm run build && npx wrangler deploy"
   },
   "dependencies": {
