@@ -14,7 +14,8 @@ p{color:#5d6b7c}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))
 table{width:100%;border-collapse:collapse;overflow:hidden}th,td{padding:12px;border-bottom:1px solid rgba(8,17,31,.08);text-align:left;font-size:.9rem;vertical-align:top}
 th{background:#08111f;color:white}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .admin-form{display:grid;gap:14px;margin:28px 0;padding:18px}.admin-form h2{margin:0}.admin-form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.admin-form label{display:grid;gap:6px;color:#082b66;font-size:.74rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.admin-form input{min-height:42px;padding:9px 11px;border:1px solid rgba(8,17,31,.14);border-radius:6px;font:inherit}.admin-form button{min-height:42px;align-self:end;border:0;border-radius:999px;background:#082b66;color:white;font-weight:900;cursor:pointer}.generated-link{padding:14px 16px;margin:14px 0;background:#eef8f2;border-color:rgba(16,166,106,.28)}.generated-link input{width:100%;margin-top:8px;padding:10px;border:1px solid rgba(16,166,106,.35);border-radius:6px;font:inherit}.timeline{display:grid;gap:10px}.timeline-item{padding:14px 16px;background:white;border:1px solid rgba(8,17,31,.1);border-radius:8px;box-shadow:0 8px 24px rgba(8,17,31,.06)}.timeline-item strong{display:block}.timeline-item small{color:#5d6b7c}.timeline-item pre{white-space:pre-wrap;word-break:break-word;background:#f6f8fb;border-radius:6px;padding:10px;max-height:220px;overflow:auto}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2f7;color:#082b66;font-size:.74rem;font-weight:900}
-@media(max-width:760px){.grid{grid-template-columns:1fr 1fr}table{display:block;overflow-x:auto}}
+.insight-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin:24px 0}.insight-card{background:white;border:1px solid rgba(8,17,31,.1);border-radius:8px;box-shadow:0 12px 32px rgba(8,17,31,.08);padding:18px}.insight-card h2,.insight-card h3{margin:0 0 12px}.metric-list{display:grid;gap:10px}.metric-row{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;padding:10px 0;border-bottom:1px solid rgba(8,17,31,.08)}.metric-row:last-child{border-bottom:0}.metric-row strong{font-size:1rem}.metric-row span{color:#5d6b7c}.metric-value{font-weight:900;color:#08111f;white-space:nowrap}.section-bar{height:8px;background:#e8eef6;border-radius:999px;overflow:hidden;margin-top:7px}.section-bar span{display:block;height:100%;background:#0f4ea8;border-radius:999px}.empty{padding:18px;background:white;border:1px dashed rgba(8,17,31,.2);border-radius:8px;color:#5d6b7c}.details{margin-top:28px}.details summary{cursor:pointer;font-weight:900;color:#082b66;margin-bottom:12px}.action-table td:first-child{white-space:nowrap;color:#5d6b7c}.subtle{color:#5d6b7c}.kicker{font-weight:900;color:#082b66;text-transform:uppercase;letter-spacing:.08em}
+@media(max-width:760px){.grid,.insight-grid{grid-template-columns:1fr}table{display:block;overflow-x:auto}.admin-form-grid{grid-template-columns:1fr}}
 `;
 
 export default {
@@ -412,7 +413,7 @@ async function handleAdminSession(request, env, url) {
   ).bind(sessionId, session.token).all()).results;
 
   const visitor = visitorLabel(session, events);
-  const summary = summarizeEvents(events);
+  const summary = summarizeEvents(events, session);
 
   return html(renderAdminShell(`
     <p><a href="/admin">Back to admin</a></p>
@@ -424,17 +425,41 @@ async function handleAdminSession(request, env, url) {
       <span class="badge">${escapeHtml([session.country, session.region].filter(Boolean).join(" / ") || "unknown location")}</span>
     </p>
     <section class="grid">
-      <div class="card"><strong>${Math.round((session.active_time_seconds ?? 0) / 60)}</strong><span>Active minutes</span></div>
+      <div class="card"><strong>${escapeHtml(formatDuration(summary.activeSeconds))}</strong><span>Active time on site</span></div>
       <div class="card"><strong>${summary.sections.length}</strong><span>Sections viewed</span></div>
-      <div class="card"><strong>${summary.articles}</strong><span>Articles opened</span></div>
-      <div class="card"><strong>${summary.clicks}</strong><span>Clicks / actions</span></div>
+      <div class="card"><strong>${summary.articleOpenCount}</strong><span>Articles opened</span></div>
+      <div class="card"><strong>${summary.actions.length}</strong><span>Clicks / actions</span></div>
     </section>
-    <h2>Visitor profile</h2>
-    ${table([session], ["session_id","name","role","email","parent_token","parent_name","started_at","last_seen_at","browser","os","referrer"])}
-    <h2>Sections viewed</h2>
-    ${summary.sections.length ? table(summary.sections.map((section) => ({ section })), ["section"]) : "<p>No section view recorded yet.</p>"}
-    <h2>Complete behavior timeline</h2>
-    <div class="timeline">${events.map(renderTimelineEvent).join("") || "<p>No event recorded yet.</p>"}</div>
+    <section class="insight-grid">
+      <article class="insight-card">
+        <p class="kicker">Behavior report</p>
+        <h2>What this visitor actually did</h2>
+        <div class="metric-list">
+          ${summary.keyFindings.map((item) => `<div class="metric-row"><strong>${escapeHtml(item.label)}</strong><span class="metric-value">${escapeHtml(item.value)}</span></div>`).join("")}
+        </div>
+      </article>
+      <article class="insight-card">
+        <p class="kicker">Visitor profile</p>
+        <h2>Context</h2>
+        <div class="metric-list">
+          <div class="metric-row"><strong>Identity</strong><span>${escapeHtml(visitor)}</span></div>
+          <div class="metric-row"><strong>Email</strong><span>${escapeHtml(session.email ?? "Unknown")}</span></div>
+          <div class="metric-row"><strong>Role</strong><span>${escapeHtml(session.role ?? "Unknown")}</span></div>
+          <div class="metric-row"><strong>Session</strong><span><code>${escapeHtml(session.session_id)}</code></span></div>
+          <div class="metric-row"><strong>Referrer</strong><span>${escapeHtml(session.referrer ?? "Direct")}</span></div>
+        </div>
+      </article>
+    </section>
+    <h2>Time by section</h2>
+    ${summary.sections.length ? renderSectionSummary(summary.sections, summary.maxSectionSeconds) : `<p class="empty">No section view recorded yet.</p>`}
+    <h2>Articles opened</h2>
+    ${summary.articles.length ? renderArticleSummary(summary.articles) : `<p class="empty">No article opened yet.</p>`}
+    <h2>Actions and clicks</h2>
+    ${summary.actions.length ? renderActionSummary(summary.actions) : `<p class="empty">No click or explicit action recorded yet.</p>`}
+    <details class="details">
+      <summary>Complete raw behavior timeline</summary>
+      <div class="timeline">${events.map(renderTimelineEvent).join("") || "<p>No event recorded yet.</p>"}</div>
+    </details>
   `));
 }
 
@@ -498,32 +523,200 @@ function visitorLabel(session, events) {
   return "Anonymous visitor";
 }
 
-function summarizeEvents(events) {
-  const sections = new Set();
-  let articles = 0;
-  let clicks = 0;
+function summarizeEvents(events, session = {}) {
+  const sorted = [...events].sort((a, b) => eventMs(a) - eventMs(b));
+  const sectionMap = new Map();
+  const articleMap = new Map();
+  const actions = [];
+  const hasHeartbeats = sorted.some((event) => event.event_type === "heartbeat");
+  let currentSection = null;
 
-  events.forEach((event) => {
+  sorted.forEach((event, index) => {
     const data = parseEventData(event.event_data);
-    if (event.event_type === "section_view") sections.add(data.sectionTitle || data.sectionId || event.section_id);
-    if (event.event_type === "case_article_open") articles += 1;
-    if (
-      event.event_type.includes("click") ||
-      event.event_type === "cta_click" ||
-      event.event_type === "document_download" ||
-      event.event_type === "appointment_request" ||
-      event.event_type === "message_sent" ||
-      event.event_type === "share_link_generated"
-    ) {
-      clicks += 1;
+    const next = sorted[index + 1];
+    const delta = next ? Math.max(0, Math.min(60, Math.round((eventMs(next) - eventMs(event)) / 1000))) : 0;
+
+    if (event.event_type === "section_view") {
+      currentSection = {
+        id: data.sectionId || event.section_id || "unknown-section",
+        title: data.sectionTitle || data.sectionId || event.section_id || "Unknown section",
+      };
+      touchSection(sectionMap, currentSection.id, currentSection.title).views += 1;
     }
+
+    if (!hasHeartbeats && currentSection && delta > 0) {
+      touchSection(sectionMap, currentSection.id, currentSection.title).seconds += delta;
+    }
+
+    if (event.event_type === "heartbeat") {
+      const sectionId = event.section_id || data.currentSection || data.sectionId || currentSection?.id || "active-session";
+      const title = readableSection(sectionId);
+      touchSection(sectionMap, sectionId, title).seconds += 15;
+    }
+
+    if (event.event_type === "case_article_open") {
+      const articleId = data.caseId || data.articleTitle || "unknown-article";
+      const article = touchArticle(articleMap, articleId, data.articleTitle || data.caseTitle || articleId);
+      article.opens += 1;
+      article.sources.add(data.source || "direct");
+      article.seconds += estimateArticleSeconds(sorted, index, articleId);
+    }
+
+    const action = summarizeAction(event, data);
+    if (action) actions.push(action);
   });
 
+  const sections = [...sectionMap.values()]
+    .map((section) => ({ ...section, seconds: Math.min(section.seconds, session.active_time_seconds ?? section.seconds) }))
+    .sort((a, b) => b.seconds - a.seconds || b.views - a.views);
+  const articles = [...articleMap.values()]
+    .map((article) => ({ ...article, sources: [...article.sources].filter(Boolean).join(", ") }))
+    .sort((a, b) => b.seconds - a.seconds || b.opens - a.opens);
+  const activeSeconds = Math.max(session.active_time_seconds ?? 0, sections.reduce((sum, section) => sum + section.seconds, 0));
+  const articleSeconds = articles.reduce((sum, article) => sum + article.seconds, 0);
+  const topSection = sections[0];
+  const topArticle = articles[0];
+  const lastAction = actions[actions.length - 1];
+
   return {
-    sections: [...sections].filter(Boolean),
+    activeSeconds,
+    sections,
+    maxSectionSeconds: Math.max(1, ...sections.map((section) => section.seconds)),
     articles,
-    clicks,
+    articleOpenCount: articles.reduce((sum, article) => sum + article.opens, 0),
+    articleSeconds,
+    actions,
+    keyFindings: [
+      { label: "Active time on site", value: formatDuration(activeSeconds) },
+      { label: "Main section", value: topSection ? `${topSection.title} (${formatDuration(topSection.seconds)})` : "Not enough data yet" },
+      { label: "Article engagement", value: topArticle ? `${topArticle.title} (${formatDuration(topArticle.seconds)})` : "No article opened" },
+      { label: "Total article reading time", value: formatDuration(articleSeconds) },
+      { label: "Last explicit action", value: lastAction ? `${lastAction.label} at ${formatClock(lastAction.created_at)}` : "No action yet" },
+    ],
   };
+}
+
+function touchSection(sectionMap, id, title) {
+  if (!sectionMap.has(id)) sectionMap.set(id, { id, title: title || readableSection(id), views: 0, seconds: 0 });
+  return sectionMap.get(id);
+}
+
+function touchArticle(articleMap, id, title) {
+  if (!articleMap.has(id)) articleMap.set(id, { id, title: title || id, opens: 0, seconds: 0, sources: new Set() });
+  return articleMap.get(id);
+}
+
+function estimateArticleSeconds(events, openIndex, articleId) {
+  const openedAt = eventMs(events[openIndex]);
+  const close = events.slice(openIndex + 1).find((event) => {
+    const data = parseEventData(event.event_data);
+    if (event.event_type !== "case_article_close") return false;
+    return !articleId || data.caseId === articleId || data.articleTitle === articleId;
+  });
+  if (close) return Math.max(1, Math.min(900, Math.round((eventMs(close) - openedAt) / 1000)));
+  const next = events[openIndex + 1];
+  if (!next) return 0;
+  return Math.max(1, Math.min(120, Math.round((eventMs(next) - openedAt) / 1000)));
+}
+
+function summarizeAction(event, data) {
+  const type = event.event_type;
+  const clickableTypes = new Set([
+    "cta_click",
+    "case_file_open",
+    "document_click",
+    "document_download",
+    "linkedin_click",
+    "email_click",
+    "share_link_generated",
+    "appointment_request",
+    "message_sent",
+    "no_fit_today",
+    "gap_file_open",
+    "gap_control_marked",
+    "proof_validated",
+  ]);
+  if (!clickableTypes.has(type)) return null;
+
+  return {
+    created_at: event.created_at,
+    type,
+    section: readableSection(event.section_id || data.sectionId || data.currentSection || ""),
+    label: eventLabel(type, data, event.section_id),
+    target: data.articleTitle || data.caseTitle || data.title || data.label || data.documentId || data.caseId || data.flagId || data.ctaId || "",
+  };
+}
+
+function renderSectionSummary(sections, maxSeconds) {
+  return `<table><thead><tr><th>section</th><th>active time</th><th>views</th><th>share</th></tr></thead><tbody>${sections
+    .map((section) => {
+      const width = Math.max(6, Math.round((section.seconds / maxSeconds) * 100));
+      return `<tr>
+        <td><strong>${escapeHtml(section.title)}</strong><br><span class="subtle">${escapeHtml(section.id)}</span></td>
+        <td>${escapeHtml(formatDuration(section.seconds))}</td>
+        <td>${escapeHtml(section.views)}</td>
+        <td><div class="section-bar"><span style="width:${width}%"></span></div></td>
+      </tr>`;
+    })
+    .join("")}</tbody></table>`;
+}
+
+function renderArticleSummary(articles) {
+  return `<table><thead><tr><th>article</th><th>opens</th><th>time on article</th><th>source</th></tr></thead><tbody>${articles
+    .map((article) => `<tr>
+      <td><strong>${escapeHtml(article.title)}</strong><br><span class="subtle">${escapeHtml(article.id)}</span></td>
+      <td>${escapeHtml(article.opens)}</td>
+      <td>${escapeHtml(formatDuration(article.seconds))}</td>
+      <td>${escapeHtml(article.sources || "direct")}</td>
+    </tr>`)
+    .join("")}</tbody></table>`;
+}
+
+function renderActionSummary(actions) {
+  return `<table class="action-table"><thead><tr><th>time</th><th>action</th><th>target</th><th>section</th></tr></thead><tbody>${actions
+    .map((action) => `<tr>
+      <td>${escapeHtml(formatClock(action.created_at))}</td>
+      <td><strong>${escapeHtml(action.label)}</strong><br><span class="badge">${escapeHtml(action.type)}</span></td>
+      <td>${escapeHtml(action.target || "Site action")}</td>
+      <td>${escapeHtml(action.section || "Unknown")}</td>
+    </tr>`)
+    .join("")}</tbody></table>`;
+}
+
+function readableSection(value) {
+  if (!value) return "";
+  return String(value)
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function eventMs(event) {
+  const timestamp = Date.parse(event.created_at || "");
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function formatDuration(seconds) {
+  const total = Math.max(0, Math.round(Number(seconds) || 0));
+  const minutes = Math.floor(total / 60);
+  const remaining = total % 60;
+  if (minutes <= 0) return `${remaining}s`;
+  if (remaining === 0) return `${minutes}m`;
+  return `${minutes}m ${remaining}s`;
+}
+
+function formatClock(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }
 
 function renderTimelineEvent(event) {

@@ -2234,6 +2234,15 @@ function Modal({
     });
     setModal({ type: "case", item: linkedCase });
   };
+  const closeModal = () => {
+    if (modal?.type === "case") {
+      trackEvent("case_article_close", {
+        caseId: modal.item.id,
+        articleTitle: modal.item.title,
+      });
+    }
+    setModal(null);
+  };
 
   useEffect(() => {
     if (!modal) return;
@@ -2252,7 +2261,7 @@ function Modal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={() => setModal(null)}
+          onClick={closeModal}
         >
           <motion.div
             className={`modal modal-${modal.type}`}
@@ -2261,7 +2270,7 @@ function Modal({
             exit={{ scale: 0.96, y: 24 }}
             onClick={(event) => event.stopPropagation()}
           >
-            <button className="modal-close" onClick={() => setModal(null)}>
+            <button className="modal-close" onClick={closeModal}>
               {modal.type === "criterion" ? "Close" : <X />}
               <span className="sr-only">Close modal</span>
             </button>
