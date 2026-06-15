@@ -357,6 +357,30 @@ h3 {
   resize: vertical;
 }
 
+.action-complete {
+  background: rgba(232, 248, 240, 0.9);
+  border-color: rgba(22, 166, 106, 0.28);
+}
+
+.action-complete > strong {
+  color: #087246;
+}
+
+.action-complete p {
+  color: var(--ink);
+}
+
+.action-complete button {
+  justify-self: start;
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid rgba(22, 166, 106, 0.28);
+  border-radius: 999px;
+  background: white;
+  color: #087246;
+  font-weight: 950;
+}
+
 .contact-methods {
   display: flex;
   flex-wrap: wrap;

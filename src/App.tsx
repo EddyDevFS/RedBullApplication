@@ -2426,6 +2426,7 @@ function Modal({
 function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
   const [status, setStatus] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState<"schedule" | "message" | null>(null);
+  const [completeMessage, setCompleteMessage] = useState<string | null>(null);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -2497,8 +2498,24 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
       requestedTime: form.time,
     });
     trackEvent(type, { title: form.title, email: form.email, contactMethod: form.contactMethod });
-    setStatus(type === "appointment_request" ? "Request sent - Eddy will confirm by email" : "Message sent to Eddy");
+    setFormOpen(null);
+    setStatus(null);
+    setCompleteMessage(
+      type === "appointment_request"
+        ? "Your conversation request has been received. Eddy will confirm the final time and format by email shortly."
+        : "Your message has been sent to Eddy. It is now visible in the application admin.",
+    );
   };
+
+  if (completeMessage) {
+    return (
+      <div className="action-form action-complete" role="status">
+        <strong>{label === "Request a conversation" ? "Request received" : "Message received"}</strong>
+        <p>{completeMessage}</p>
+        <button onClick={() => setCompleteMessage(null)}>Close message</button>
+      </div>
+    );
+  }
 
   if (formOpen === "schedule") {
     return (
