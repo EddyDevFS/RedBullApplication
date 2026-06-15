@@ -431,6 +431,32 @@ h3 {
   color: white;
 }
 
+.generated-share-link {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(22, 166, 106, 0.28);
+  border-radius: 8px;
+  background: rgba(232, 248, 240, 0.76);
+}
+
+.generated-share-link label {
+  display: grid;
+  gap: 6px;
+  color: #087246;
+  font-size: 0.82rem;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.generated-share-link input {
+  color: var(--ink);
+  font-size: 0.92rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .scroll-cue {
   position: absolute;
   z-index: 2;

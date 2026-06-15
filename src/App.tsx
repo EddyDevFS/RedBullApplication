@@ -2425,13 +2425,16 @@ function Modal({
 
 function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
   const [status, setStatus] = useState<string | null>(null);
-  const [formOpen, setFormOpen] = useState<"schedule" | "message" | null>(null);
+  const [formOpen, setFormOpen] = useState<"schedule" | "message" | "forward" | null>(null);
   const [completeMessage, setCompleteMessage] = useState<string | null>(null);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     email: "",
     contactMethod: "phone",
+    recipientName: "",
+    recipientEmail: "",
+    shareUrl: "",
     title: "",
     message: "",
     date: "",
@@ -2444,6 +2447,21 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
   };
   const updateField = (field: keyof typeof form, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
+  };
+  const generateForwardLink = async () => {
+    const recipient = form.recipientName.trim();
+    const shareUrl = await createShareLink(recipient ? `Forwarded to ${recipient}` : "Forwarded from Red Bull recruiter");
+    updateField("shareUrl", shareUrl);
+    setStatus("Tracked link generated");
+  };
+  const emailForwardLink = () => {
+    const recipientEmail = form.recipientEmail.trim();
+    const subject = encodeURIComponent("Red Bull candidate file to review");
+    const greeting = form.recipientName.trim() ? `Hi ${form.recipientName.trim()},` : "Hi,";
+    const body = encodeURIComponent(
+      `${greeting}\n\nI am forwarding Eddy Sallault's Red Bull candidate file for review:\n\n${form.shareUrl}\n\nBest,`,
+    );
+    window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
   };
   const appointmentDates = () => {
     const start = form.date && form.time ? new Date(`${form.date}T${form.time}`) : new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -2581,6 +2599,46 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
     );
   }
 
+  if (formOpen === "forward") {
+    return (
+      <div className="action-form">
+        <strong>Forward this profile</strong>
+        <p className="action-form-note">
+          Generate a tracked invitation link for the person who should review this candidate file.
+        </p>
+        <div className="action-form-grid">
+          <input
+            placeholder="Recipient name"
+            value={form.recipientName}
+            onChange={(event) => updateField("recipientName", event.target.value)}
+          />
+          <input
+            placeholder="Recipient email (optional)"
+            type="email"
+            value={form.recipientEmail}
+            onChange={(event) => updateField("recipientEmail", event.target.value)}
+          />
+        </div>
+        <div className="action-form-actions">
+          <button onClick={generateForwardLink}>{status ?? "Generate tracked link"}</button>
+          <button onClick={() => setFormOpen(null)}>Back</button>
+        </div>
+        {form.shareUrl && (
+          <div className="generated-share-link">
+            <label>
+              Link generated
+              <input readOnly value={form.shareUrl} onFocus={(event) => event.currentTarget.select()} />
+            </label>
+            <div className="action-form-actions">
+              <button onClick={() => copyText(form.shareUrl, "Link copied")}>Copy link</button>
+              <button onClick={emailForwardLink}>Send by email</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   if (label === "Request a conversation" || label === "Schedule a conversation") {
     return (
       <button data-track-click="cta_click" data-track-id="schedule-conversation" data-track-label={label} onClick={() => setFormOpen("schedule")}>
@@ -2607,11 +2665,7 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
         data-track-click="cta_click"
         data-track-id="generate-tracked-invite-link"
         data-track-label={label}
-        onClick={async () => {
-          const sender = window.prompt("Who is forwarding this candidate file?")?.trim();
-          const shareUrl = await createShareLink(sender ? `Forwarded by ${sender}` : "Forwarded from Red Bull recruiter");
-          await copyText(shareUrl, "Invite link copied");
-        }}
+        onClick={() => setFormOpen("forward")}
       >
         {status ?? label}
       </button>
@@ -2624,13 +2678,7 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
         data-track-click="cta_click"
         data-track-id="email-the-invite"
         data-track-label={label}
-        onClick={async () => {
-          const sender = window.prompt("Who is forwarding this candidate file?")?.trim();
-          const shareUrl = await createShareLink(sender ? `Forwarded by ${sender}` : "Forwarded from Red Bull recruiter");
-          const subject = encodeURIComponent("Red Bull candidate file to review");
-          const body = encodeURIComponent(`Hi,\n\nI am forwarding Eddy Sallault's Red Bull candidate file for review:\n\n${shareUrl}\n\nBest,`);
-          window.location.href = `mailto:?subject=${subject}&body=${body}`;
-        }}
+        onClick={() => setFormOpen("forward")}
       >
         {label}
       </button>
