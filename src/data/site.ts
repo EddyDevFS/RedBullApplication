@@ -18,6 +18,7 @@ import type { LucideIcon } from "lucide-react";
 export const contact = {
   name: "Eddy Sallault",
   email: "sallault.eddy@gmail.com",
+  phone: "786 757 4703",
   linkedin: "https://www.linkedin.com/in/eddy-sallault/",
   role: "General Sales Manager",
   targetLocation: "Ottawa, Canada",
@@ -289,14 +290,14 @@ export const objections = [
 
 export const finalActions = [
   {
-    title: "Schedule a conversation",
+    title: "Request a conversation",
     icon: Gauge,
     body:
-      "If the profile is worth a live discussion, the next step is simple: schedule a conversation or send me a direct message from here.",
-    actions: ["Schedule a conversation", "Send message from here", "Email Eddy"],
+      "If the profile is worth a live discussion, send a conversation request from here. Choose phone or video, suggest a time, and I will confirm by email.",
+    actions: ["Request a conversation", "Send message from here", "Email Eddy"],
   },
   {
-    title: "Transfer the application",
+    title: "Forward this profile",
     icon: LinkIcon,
     body:
       "If this candidate file should be reviewed by another Red Bull stakeholder, generate a tracked invitation link. I will know it was forwarded from this review path, and the invited visitor can identify themselves or continue anonymously.",
@@ -307,6 +308,6 @@ export const finalActions = [
     icon: Mail,
     body:
       "If there is nothing to propose right now, you can still leave a signal: send a short note, email me directly, or simply mark that there is no fit today.",
-    actions: ["Leave a short note", "Email Eddy", "Mark no fit today"],
+    actions: ["Leave a note for Eddy", "Email Eddy", "Mark no fit today"],
   },
 ];

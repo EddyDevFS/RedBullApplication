@@ -327,6 +327,13 @@ h3 {
   text-transform: uppercase;
 }
 
+.action-form-note {
+  margin: -2px 0 2px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
 .action-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -348,6 +355,33 @@ h3 {
 .action-form textarea {
   min-height: 96px;
   resize: vertical;
+}
+
+.contact-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.contact-methods label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: white;
+  color: var(--ink);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.contact-methods input {
+  width: auto;
+  min-height: auto;
+  padding: 0;
+  accent-color: var(--blue);
 }
 
 .action-form-actions {

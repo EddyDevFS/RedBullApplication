@@ -1926,9 +1926,9 @@ function FinalDecision({
   const [focusedAction, setFocusedAction] = useState(0);
   const [decisionActivated, setDecisionActivated] = useState(false);
   const choiceSummaries = [
-    "A short conversation is the next step. Let's test the fit, clarify the learning curve, and explore how my field leadership can take off in the Ottawa market.",
+    "A short conversation is the next step. We can test the fit, clarify the learning curve, and discuss how my field leadership could apply in the Ottawa market.",
     "If this profile should be reviewed by another leader in Sales, Distribution, or Talent Acquisition, the complete candidate file is ready to forward.",
-    "If this role is not the right match today, keep my profile on the shelf for future opportunities where territory building and field leadership are key.",
+    "If this role is not the right match today, leave a clear note or signal so I understand the status without guessing.",
   ];
   const mailHref = `mailto:${contact.email}?subject=Red%20Bull%20Application%20-%20${encodeURIComponent(
     contact.name,
@@ -2031,21 +2031,21 @@ function FinalDecision({
               >
                 <span className="wing-choice-number">{String(index + 1).padStart(2, "0")}</span>
                 <Icon className="wing-choice-icon" size={34} />
-                <strong>
-                  {index === 0
-                    ? "Yes - let's try the wings on."
+                  <strong>
+                    {index === 0
+                    ? "Start a live conversation."
                     : index === 1
-                      ? "Not your pair to assign?"
-                      : "No wings in my size today?"}
+                      ? "Forward to the right stakeholder."
+                      : "No opening right now."}
                 </strong>
                 <p>{choiceSummaries[index]}</p>
                 <span className="wing-choice-visual" aria-hidden="true" />
                 <em>
                   {index === 0
-                    ? "Invite me to the fitting room"
+                    ? "Request a conversation"
                     : index === 1
-                      ? "Send to the wing specialist"
-                      : "Keep me in the wing room"}
+                      ? "Forward this profile"
+                      : "Leave a clean signal"}
                   <ArrowDown size={18} />
                 </em>
               </button>
@@ -2430,6 +2430,7 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
     firstName: "",
     lastName: "",
     email: "",
+    contactMethod: "phone",
     title: "",
     message: "",
     date: "",
@@ -2451,8 +2452,15 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
   };
   const downloadIcs = () => {
     const { googleStart, googleEnd } = appointmentDates();
-    const title = "Conversation with Eddy Sallault";
-    const description = `Red Bull candidate file conversation. Contact: ${form.firstName} ${form.lastName} ${form.email}`;
+    const title = "Requested conversation with Eddy Sallault";
+    const method = form.contactMethod === "video" ? "Video call" : `Phone call (${contact.phone})`;
+    const description = [
+      "Conversation request from the Red Bull candidate file.",
+      "Status: pending confirmation from Eddy by email.",
+      `Preferred format: ${method}`,
+      `Requester: ${form.firstName} ${form.lastName} ${form.email}`,
+      form.message ? `Note: ${form.message}` : "",
+    ].filter(Boolean).join("\\n");
     const ics = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -2463,6 +2471,7 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
       `DTSTART:${googleStart}`,
       `DTEND:${googleEnd}`,
       `SUMMARY:${title}`,
+      `LOCATION:${method}`,
       `DESCRIPTION:${description.replace(/\n/g, "\\n")}`,
       "END:VEVENT",
       "END:VCALENDAR",
@@ -2474,12 +2483,6 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
     link.click();
     URL.revokeObjectURL(url);
   };
-  const googleCalendarHref = () => {
-    const { googleStart, googleEnd } = appointmentDates();
-    const text = encodeURIComponent("Conversation with Eddy Sallault");
-    const details = encodeURIComponent(`Red Bull candidate file conversation.\nContact: ${form.firstName} ${form.lastName} ${form.email}`);
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${googleStart}/${googleEnd}&details=${details}`;
-  };
   const submitForm = async (type: "appointment_request" | "message_sent") => {
     await submitAdminMessage({
       type,
@@ -2488,17 +2491,23 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
       email: form.email,
       title: form.title || (type === "appointment_request" ? "Conversation request" : "Message from candidate file"),
       message: form.message,
+      contactMethod: form.contactMethod,
+      contactPhone: contact.phone,
       requestedDate: form.date,
       requestedTime: form.time,
     });
-    trackEvent(type, { title: form.title, email: form.email });
-    setStatus(type === "appointment_request" ? "Request sent to admin" : "Message sent to admin");
+    trackEvent(type, { title: form.title, email: form.email, contactMethod: form.contactMethod });
+    setStatus(type === "appointment_request" ? "Request sent - Eddy will confirm by email" : "Message sent to Eddy");
   };
 
   if (formOpen === "schedule") {
     return (
       <div className="action-form">
-        <strong>Schedule a conversation</strong>
+        <strong>Request a conversation</strong>
+        <p className="action-form-note">
+          This creates a request in Eddy&apos;s admin. The calendar file is only a provisional hold until Eddy confirms by email.
+          Contact: {contact.phone}.
+        </p>
         <div className="action-form-grid">
           <input placeholder="First name" value={form.firstName} onChange={(event) => updateField("firstName", event.target.value)} />
           <input placeholder="Last name" value={form.lastName} onChange={(event) => updateField("lastName", event.target.value)} />
@@ -2506,11 +2515,31 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
           <input type="date" value={form.date} onChange={(event) => updateField("date", event.target.value)} />
           <input type="time" value={form.time} onChange={(event) => updateField("time", event.target.value)} />
         </div>
+        <div className="contact-methods" role="radiogroup" aria-label="Preferred conversation format">
+          <label>
+            <input
+              type="radio"
+              name="contact-method"
+              checked={form.contactMethod === "phone"}
+              onChange={() => updateField("contactMethod", "phone")}
+            />
+            Phone
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="contact-method"
+              checked={form.contactMethod === "video"}
+              onChange={() => updateField("contactMethod", "video")}
+            />
+            Video
+          </label>
+        </div>
         <textarea placeholder="Optional note" value={form.message} onChange={(event) => updateField("message", event.target.value)} />
         <div className="action-form-actions">
-          <button onClick={() => submitForm("appointment_request")}>{status ?? "Send request to admin"}</button>
-          <a href={googleCalendarHref()} target="_blank" rel="noreferrer">Open Google Calendar</a>
-          <button onClick={downloadIcs}>Download .ics</button>
+          <button onClick={() => submitForm("appointment_request")}>{status ?? "Send request to Eddy"}</button>
+          <button onClick={downloadIcs}>Download provisional .ics</button>
+          <button onClick={() => setFormOpen(null)}>Back</button>
         </div>
       </div>
     );
@@ -2528,14 +2557,14 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
         <input placeholder="Title" value={form.title} onChange={(event) => updateField("title", event.target.value)} />
         <textarea placeholder="Message" value={form.message} onChange={(event) => updateField("message", event.target.value)} />
         <div className="action-form-actions">
-          <button onClick={() => submitForm("message_sent")}>{status ?? "Send to admin"}</button>
+          <button onClick={() => submitForm("message_sent")}>{status ?? "Send to Eddy"}</button>
           <button onClick={() => setFormOpen(null)}>Back</button>
         </div>
       </div>
     );
   }
 
-  if (label === "Schedule a conversation") {
+  if (label === "Request a conversation" || label === "Schedule a conversation") {
     return (
       <button data-track-click="cta_click" data-track-id="schedule-conversation" data-track-label={label} onClick={() => setFormOpen("schedule")}>
         {label}
@@ -2604,7 +2633,7 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
     );
   }
 
-  if (label === "Leave a short note") {
+  if (label === "Leave a short note" || label === "Leave a note for Eddy") {
     return (
       <button data-track-click="cta_click" data-track-id="leave-short-note" data-track-label={label} onClick={() => setFormOpen("message")}>
         {label}
