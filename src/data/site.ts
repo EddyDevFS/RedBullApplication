@@ -301,7 +301,7 @@ export const finalActions = [
     icon: LinkIcon,
     body:
       "If this candidate file should be reviewed by another Red Bull stakeholder, generate a tracked invitation link. I will know it was forwarded from this review path, and the invited visitor can identify themselves or continue anonymously.",
-    actions: ["Generate tracked invite link", "Email the invite", "Copy current link"],
+    actions: ["Forward this profile"],
   },
   {
     title: "No opening for now",

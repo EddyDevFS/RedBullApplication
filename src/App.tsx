@@ -2659,41 +2659,15 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
     return <a href={mailHref} data-track-click="email_click" data-track-id="email-direct" data-track-label={label}>{label}</a>;
   }
 
-  if (label === "Generate tracked invite link") {
+  if (label === "Forward this profile") {
     return (
       <button
         data-track-click="cta_click"
-        data-track-id="generate-tracked-invite-link"
-        data-track-label={label}
-        onClick={() => setFormOpen("forward")}
-      >
-        {status ?? label}
-      </button>
-    );
-  }
-
-  if (label === "Email the invite") {
-    return (
-      <button
-        data-track-click="cta_click"
-        data-track-id="email-the-invite"
+        data-track-id="forward-this-profile"
         data-track-label={label}
         onClick={() => setFormOpen("forward")}
       >
         {label}
-      </button>
-    );
-  }
-
-  if (label === "Copy current link") {
-    return (
-      <button
-        data-track-click="cta_click"
-        data-track-id="copy-current-link"
-        data-track-label={label}
-        onClick={() => copyText(typeof window === "undefined" ? "" : window.location.href, "Current link copied")}
-      >
-        {status ?? label}
       </button>
     );
   }
