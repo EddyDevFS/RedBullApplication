@@ -357,6 +357,7 @@ async function handleAdmin(request, env) {
         json_extract(event_data, '$.contactMethod') AS contact_method,
         json_extract(event_data, '$.requestedDate') AS requested_date,
         json_extract(event_data, '$.requestedTime') AS requested_time,
+        json_extract(event_data, '$.requestedTimeZone') AS requested_time_zone,
         json_extract(event_data, '$.contactPhone') AS contact_phone,
         created_at
        FROM messages
@@ -405,7 +406,7 @@ function renderAdmin(totals, visitors, topEvents, links, messages, generatedLink
       <div class="card"><strong>${Math.round(totals.active_seconds / 60)}</strong><span>Active minutes</span></div>
     </section>
     <h2>Visitors - last 15 days</h2>${visitorControlTable(visitors)}
-    <h2>Messages & appointments</h2>${table(messages, ["type","first_name","last_name","email","title","message","contact_method","requested_date","requested_time","contact_phone","token","created_at"])}
+    <h2>Messages & appointments</h2>${table(messages, ["type","first_name","last_name","email","title","message","contact_method","requested_date","requested_time","requested_time_zone","contact_phone","token","created_at"])}
     <h2>Top events</h2>${table(topEvents, ["event_type","count"])}
     <h2>Links</h2>${table(links, ["token","name","company","role","email","parent_token","parent_name","campaign","status","last_opened_at"])}
   </main></body></html>`;

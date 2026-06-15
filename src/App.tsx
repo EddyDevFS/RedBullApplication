@@ -71,6 +71,62 @@ type CaseStudy = {
 };
 
 const caseStudies = caseStudyData.cases as CaseStudy[];
+const EASTERN_TIME_ZONE = "America/New_York";
+
+function getTimeZoneOffsetMs(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  const asUtc = Date.UTC(
+    Number(values.year),
+    Number(values.month) - 1,
+    Number(values.day),
+    Number(values.hour),
+    Number(values.minute),
+    Number(values.second),
+  );
+  return asUtc - date.getTime();
+}
+
+function easternInputValues(date: Date) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: EASTERN_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return {
+    date: `${values.year}-${values.month}-${values.day}`,
+    time: `${values.hour}:${values.minute}`,
+  };
+}
+
+function nextEasternConversationSlot() {
+  const next = new Date(Date.now() + 60 * 60 * 1000);
+  const roundedMinutes = Math.ceil(next.getMinutes() / 15) * 15;
+  next.setMinutes(roundedMinutes, 0, 0);
+  return easternInputValues(next);
+}
+
+function easternWallTimeToUtc(dateValue: string, timeValue: string) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  const [hour, minute] = timeValue.split(":").map(Number);
+  const naiveUtc = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
+  const offset = getTimeZoneOffsetMs(naiveUtc, EASTERN_TIME_ZONE);
+  return new Date(naiveUtc.getTime() - offset);
+}
 
 const caseImageMap: Record<string, string> = {
   "first-agency": "/assets/images/case-contres.jpg",
@@ -541,10 +597,36 @@ function Hero({ setModal }: { setModal: (modal: ModalState) => void }) {
 }
 
 function CansIntro() {
+  const backgroundVideoRef = useRef<HTMLVideoElement>(null);
+  const mainVideoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const replayTimers: number[] = [];
+    const videos = [backgroundVideoRef.current, mainVideoRef.current].filter(Boolean) as HTMLVideoElement[];
+    const replayAfterDelay = (video: HTMLVideoElement) => {
+      const timer = window.setTimeout(() => {
+        video.currentTime = 0;
+        video.play().catch(() => undefined);
+      }, 3000);
+      replayTimers.push(timer);
+    };
+    const handlers = videos.map((video) => {
+      const handler = () => replayAfterDelay(video);
+      video.addEventListener("ended", handler);
+      return { video, handler };
+    });
+
+    return () => {
+      replayTimers.forEach((timer) => window.clearTimeout(timer));
+      handlers.forEach(({ video, handler }) => video.removeEventListener("ended", handler));
+    };
+  }, []);
+
   return (
     <section className="video-hero-section cans-hero-video" id="cans" data-track-section="evidence-validation">
       <div className="video-hero-stage">
         <video
+          ref={backgroundVideoRef}
           className="video-hero-bg"
           src={assets.cansVideo}
           poster={assets.cansPoster}
@@ -555,6 +637,7 @@ function CansIntro() {
           aria-hidden="true"
         />
         <video
+          ref={mainVideoRef}
           className="video-hero-main"
           src={assets.cansVideo}
           poster={assets.cansPoster}
@@ -2448,6 +2531,14 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
   const updateField = (field: keyof typeof form, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
   };
+  const openScheduleForm = () => {
+    setForm((current) => {
+      if (current.date && current.time) return current;
+      const nextSlot = nextEasternConversationSlot();
+      return { ...current, date: current.date || nextSlot.date, time: current.time || nextSlot.time };
+    });
+    setFormOpen("schedule");
+  };
   const generateForwardLink = async () => {
     const recipient = form.recipientName.trim();
     const shareUrl = await createShareLink(recipient ? `Forwarded to ${recipient}` : "Forwarded from Red Bull recruiter");
@@ -2464,7 +2555,10 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
     window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
   };
   const appointmentDates = () => {
-    const start = form.date && form.time ? new Date(`${form.date}T${form.time}`) : new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const fallback = nextEasternConversationSlot();
+    const dateValue = form.date || fallback.date;
+    const timeValue = form.time || fallback.time;
+    const start = easternWallTimeToUtc(dateValue, timeValue);
     const end = new Date(start.getTime() + 30 * 60 * 1000);
     const format = (date: Date) => date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
     return { start, end, googleStart: format(start), googleEnd: format(end) };
@@ -2477,6 +2571,7 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
       "Conversation request from the Red Bull candidate file.",
       "Status: pending confirmation from Eddy by email.",
       `Preferred format: ${method}`,
+      `Requested time zone: Eastern time / Orlando (${EASTERN_TIME_ZONE})`,
       `Requester: ${form.firstName} ${form.lastName} ${form.email}`,
       form.message ? `Note: ${form.message}` : "",
     ].filter(Boolean).join("\\n");
@@ -2514,6 +2609,7 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
       contactPhone: contact.phone,
       requestedDate: form.date,
       requestedTime: form.time,
+      requestedTimeZone: EASTERN_TIME_ZONE,
     });
     trackEvent(type, { title: form.title, email: form.email, contactMethod: form.contactMethod });
     setFormOpen(null);
@@ -2541,7 +2637,7 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
         <strong>Request a conversation</strong>
         <p className="action-form-note">
           This creates a request in Eddy&apos;s admin. The calendar file is only a provisional hold until Eddy confirms by email.
-          Contact: {contact.phone}.
+          Times are requested in Eastern time / Orlando. Contact: {contact.phone}.
         </p>
         <div className="action-form-grid">
           <input placeholder="First name" value={form.firstName} onChange={(event) => updateField("firstName", event.target.value)} />
@@ -2641,7 +2737,7 @@ function ActionLink({ label, mailHref }: { label: string; mailHref: string }) {
 
   if (label === "Request a conversation" || label === "Schedule a conversation") {
     return (
-      <button data-track-click="cta_click" data-track-id="schedule-conversation" data-track-label={label} onClick={() => setFormOpen("schedule")}>
+      <button data-track-click="cta_click" data-track-id="schedule-conversation" data-track-label={label} onClick={openScheduleForm}>
         {label}
       </button>
     );
