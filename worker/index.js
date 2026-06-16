@@ -203,11 +203,15 @@ async function heartbeat(request, env) {
   const body = await readJson(request);
   if (!body.sessionId || !body.token) return json({ error: "Invalid heartbeat" }, 400);
 
-  const session = await env.DB.prepare("SELECT last_seen_at FROM sessions WHERE session_id = ?")
+  const session = await env.DB.prepare("SELECT started_at FROM sessions WHERE session_id = ?")
     .bind(body.sessionId)
     .first();
-  const secondsSinceLastSeen = Math.max(0, Math.round((Date.now() - timestampMs(session?.last_seen_at)) / 1000));
-  const activeIncrement = Math.min(15, secondsSinceLastSeen);
+  const lastHeartbeat = await env.DB.prepare(
+    "SELECT MAX(created_at) AS last_heartbeat_at FROM events WHERE session_id = ? AND event_type = 'heartbeat'",
+  ).bind(body.sessionId).first();
+  const previousHeartbeatMs = timestampMs(lastHeartbeat?.last_heartbeat_at) || timestampMs(session?.started_at);
+  const secondsSinceLastHeartbeat = Math.max(0, Math.round((Date.now() - previousHeartbeatMs) / 1000));
+  const activeIncrement = Math.min(15, secondsSinceLastHeartbeat);
 
   await env.DB.batch([
     env.DB.prepare(
@@ -401,6 +405,7 @@ async function createRecipientLink(request, env) {
 }
 
 function renderAdmin(totals, visitors, topEvents, links, messages, generatedLink, origin) {
+  const recalculatedActiveSeconds = visitors.reduce((sum, visitor) => sum + (Number(visitor.activeSeconds) || 0), 0);
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Red Bull Tracking Admin</title><style>${ADMIN_CSS}</style></head><body><main>
     <h1>Visitor Control Tower</h1>
     <p>Behavior intelligence for the Red Bull application. Engagement only, no invasive fingerprinting.</p>
@@ -410,7 +415,7 @@ function renderAdmin(totals, visitors, topEvents, links, messages, generatedLink
       <div class="card"><strong>${totals.links}</strong><span>Links</span></div>
       <div class="card"><strong>${totals.sessions}</strong><span>Sessions</span></div>
       <div class="card"><strong>${totals.events}</strong><span>Events</span></div>
-      <div class="card"><strong>${Math.round(totals.active_seconds / 60)}</strong><span>Tracked active minutes</span></div>
+      <div class="card"><strong>${Math.round(recalculatedActiveSeconds / 60)}</strong><span>Tracked active minutes, last 15 days</span></div>
     </section>
     <h2>Visitors - last 15 days</h2>${visitorControlTable(visitors)}
     <h2>Messages & appointments</h2>${table(messages, ["type","first_name","last_name","email","title","message","contact_method","requested_date","requested_time","requested_time_zone","contact_phone","token","created_at"])}
@@ -457,11 +462,7 @@ async function handleAdminSession(request, env, url) {
   ).bind(session.token).all()).results;
 
   const visitor = visitorLabel(session, events);
-  const aggregateSession = {
-    ...session,
-    active_time_seconds: sumBoundedActiveSeconds(tokenSessions),
-  };
-  const summary = summarizeEvents(events, aggregateSession);
+  const summary = summarizeEvents(events, { sessions: tokenSessions });
   const intelligence = interpretVisitor(summary, tokenSessions);
   const linkUrl = `${url.origin}/r/${session.token}`;
   const firstVisit = tokenSessions[tokenSessions.length - 1]?.started_at || "";
@@ -593,8 +594,7 @@ function buildVisitorControlRows(sessions, events, links) {
         return timestampMs(session.last_seen_at) > timestampMs(latest) ? session.last_seen_at : latest;
       }, "");
       const link = group.link || {};
-      const activeSeconds = sumBoundedActiveSeconds(group.sessions);
-      const summary = summarizeEvents(group.events, { active_time_seconds: activeSeconds });
+      const summary = summarizeEvents(group.events, { sessions: group.sessions });
       const intelligence = interpretVisitor(summary, group.sessions);
       const visitor = primarySession.visitor || primarySession.name || link.name || "Anonymous visitor";
       const companyRole = [primarySession.company || link.company, primarySession.role || link.role].filter(Boolean).join(" / ") || "Unknown role";
@@ -607,6 +607,7 @@ function buildVisitorControlRows(sessions, events, links) {
         firstStarted,
         lastVisit: lastSeen || primarySession.last_seen_at || link.last_opened_at || "",
         visitWindow: formatElapsedBetween(firstStarted, lastSeen || primarySession.last_seen_at),
+        activeSeconds: summary.activeSeconds,
         time: formatDuration(summary.activeSeconds),
         sections: summary.sections.length,
         documents: summary.documents.length,
@@ -672,6 +673,27 @@ function visitorLabel(session, events) {
 }
 
 function summarizeEvents(events, session = {}) {
+  const sessionList = Array.isArray(session.sessions) ? session.sessions : [];
+  const sessionById = new Map(sessionList.map((item) => [item.session_id, item]));
+  const grouped = new Map();
+  events.forEach((event) => {
+    const key = event.session_id || "__unknown";
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(event);
+  });
+
+  if (grouped.size > 1) {
+    return mergeSummaries(
+      [...grouped.entries()].map(([sessionId, sessionEvents]) =>
+        summarizeSingleSessionEvents(sessionEvents, sessionById.get(sessionId) || {}),
+      ),
+    );
+  }
+
+  return summarizeSingleSessionEvents(events, sessionList[0] || session);
+}
+
+function summarizeSingleSessionEvents(events, session = {}) {
   const sorted = [...events].sort((a, b) => eventMs(a) - eventMs(b));
   const sectionMap = new Map();
   const articleMap = new Map();
@@ -680,30 +702,28 @@ function summarizeEvents(events, session = {}) {
   const proofs = new Set();
   const gaps = new Set();
   const decisionActions = [];
-  const hasHeartbeats = sorted.some((event) => event.event_type === "heartbeat");
   let currentSection = null;
+  const sessionEndMs = timestampMs(session.last_seen_at) || eventMs(sorted[sorted.length - 1] || {});
 
   sorted.forEach((event, index) => {
     const data = parseEventData(event.event_data);
-    const next = sorted[index + 1];
-    const delta = next ? Math.max(0, Math.min(60, Math.round((eventMs(next) - eventMs(event)) / 1000))) : 0;
+    const eventSection = sectionFromEvent(event, data, currentSection);
 
     if (event.event_type === "section_view") {
       currentSection = {
-        id: data.sectionId || event.section_id || "unknown-section",
-        title: data.sectionTitle || data.sectionId || event.section_id || "Unknown section",
+        id: eventSection.id,
+        title: data.sectionTitle || eventSection.title,
       };
       touchSection(sectionMap, currentSection.id, currentSection.title).views += 1;
+    } else if (eventSection.id && event.event_type !== "exit") {
+      currentSection = eventSection;
     }
 
-    if (!hasHeartbeats && currentSection && delta > 0) {
+    const next = sorted[index + 1];
+    const nextMs = next ? eventMs(next) : sessionEndMs;
+    const delta = Math.max(0, Math.min(60, Math.round((nextMs - eventMs(event)) / 1000)));
+    if (currentSection?.id && delta > 0 && event.event_type !== "exit") {
       touchSection(sectionMap, currentSection.id, currentSection.title).seconds += delta;
-    }
-
-    if (event.event_type === "heartbeat") {
-      const sectionId = event.section_id || data.currentSection || data.sectionId || currentSection?.id || "active-session";
-      const title = readableSection(sectionId);
-      touchSection(sectionMap, sectionId, title).seconds += 15;
     }
 
     if (event.event_type === "case_article_open") {
@@ -727,12 +747,11 @@ function summarizeEvents(events, session = {}) {
   });
 
   const sections = [...sectionMap.values()]
-    .map((section) => ({ ...section, seconds: Math.min(section.seconds, session.active_time_seconds ?? section.seconds) }))
     .sort((a, b) => b.seconds - a.seconds || b.views - a.views);
   const articles = [...articleMap.values()]
     .map((article) => ({ ...article, sources: [...article.sources].filter(Boolean).join(", ") }))
     .sort((a, b) => b.seconds - a.seconds || b.opens - a.opens);
-  const activeSeconds = Math.max(session.active_time_seconds ?? 0, sections.reduce((sum, section) => sum + section.seconds, 0));
+  const activeSeconds = sections.reduce((sum, section) => sum + section.seconds, 0);
   const articleSeconds = articles.reduce((sum, article) => sum + article.seconds, 0);
   const topSection = sections[0];
   const topArticle = articles[0];
@@ -757,6 +776,82 @@ function summarizeEvents(events, session = {}) {
       { label: "Total article reading time", value: formatDuration(articleSeconds) },
       { label: "Last explicit action", value: lastAction ? `${lastAction.label} at ${formatClock(lastAction.created_at)}` : "No action yet" },
     ],
+  };
+}
+
+function mergeSummaries(summaries) {
+  const sectionMap = new Map();
+  const articleMap = new Map();
+  const actions = [];
+  const documents = new Set();
+  const proofs = new Set();
+  const gaps = new Set();
+  const decisionActions = [];
+
+  summaries.forEach((summary) => {
+    summary.sections.forEach((section) => {
+      const merged = touchSection(sectionMap, section.id, section.title);
+      merged.views += section.views;
+      merged.seconds += section.seconds;
+    });
+    summary.articles.forEach((article) => {
+      const merged = touchArticle(articleMap, article.id, article.title);
+      merged.opens += article.opens;
+      merged.seconds += article.seconds;
+      String(article.sources || "")
+        .split(",")
+        .map((source) => source.trim())
+        .filter(Boolean)
+        .forEach((source) => merged.sources.add(source));
+    });
+    summary.actions.forEach((action) => actions.push(action));
+    summary.documents.forEach((item) => documents.add(item));
+    summary.proofs.forEach((item) => proofs.add(item));
+    summary.gaps.forEach((item) => gaps.add(item));
+    summary.decisionActions.forEach((action) => decisionActions.push(action));
+  });
+
+  actions.sort((a, b) => timestampMs(a.created_at) - timestampMs(b.created_at));
+  decisionActions.sort((a, b) => timestampMs(a.created_at) - timestampMs(b.created_at));
+
+  const sections = [...sectionMap.values()].sort((a, b) => b.seconds - a.seconds || b.views - a.views);
+  const articles = [...articleMap.values()]
+    .map((article) => ({ ...article, sources: [...article.sources].filter(Boolean).join(", ") }))
+    .sort((a, b) => b.seconds - a.seconds || b.opens - a.opens);
+  const activeSeconds = sections.reduce((sum, section) => sum + section.seconds, 0);
+  const articleSeconds = articles.reduce((sum, article) => sum + article.seconds, 0);
+  const topSection = sections[0];
+  const topArticle = articles[0];
+  const lastAction = actions[actions.length - 1];
+
+  return {
+    activeSeconds,
+    sections,
+    maxSectionSeconds: Math.max(1, ...sections.map((section) => section.seconds)),
+    articles,
+    articleOpenCount: articles.reduce((sum, article) => sum + article.opens, 0),
+    articleSeconds,
+    actions,
+    documents: [...documents].filter(Boolean),
+    proofs: [...proofs].filter(Boolean),
+    gaps: [...gaps].filter(Boolean),
+    decisionActions,
+    keyFindings: [
+      { label: "Active time on site", value: formatDuration(activeSeconds) },
+      { label: "Main section", value: topSection ? `${topSection.title} (${formatDuration(topSection.seconds)})` : "Not enough data yet" },
+      { label: "Article engagement", value: topArticle ? `${topArticle.title} (${formatDuration(topArticle.seconds)})` : "No article opened" },
+      { label: "Total article reading time", value: formatDuration(articleSeconds) },
+      { label: "Last explicit action", value: lastAction ? `${lastAction.label} at ${formatClock(lastAction.created_at)}` : "No action yet" },
+    ],
+  };
+}
+
+function sectionFromEvent(event, data, currentSection) {
+  const sectionId = data.sectionId || data.currentSection || event.section_id || currentSection?.id || "";
+  if (!sectionId) return { id: "", title: "" };
+  return {
+    id: sectionId,
+    title: data.sectionTitle || readableSection(sectionId),
   };
 }
 
@@ -941,7 +1036,7 @@ function renderSessionStories(sessions, events) {
       const summary = summarizeEvents(sessionEvents, session);
       const storyItems = buildSessionStory(sessionEvents, summary);
       return `<details ${index === 0 ? "open" : ""}>
-        <summary>Session ${String(sessions.length - index).padStart(2, "0")} - ${escapeHtml(formatClock(session.started_at))} - ${escapeHtml(formatDuration(session.active_time_seconds ?? 0))}</summary>
+        <summary>Session ${String(sessions.length - index).padStart(2, "0")} - ${escapeHtml(formatClock(session.started_at))} - ${escapeHtml(formatDuration(summary.activeSeconds))}</summary>
         <ol>${storyItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol>
       </details>`;
     })
@@ -1072,19 +1167,6 @@ function parseEventData(value) {
   } catch {
     return {};
   }
-}
-
-function boundedSessionActiveSeconds(session) {
-  const tracked = Number(session?.active_time_seconds) || 0;
-  const started = timestampMs(session?.started_at);
-  const lastSeen = timestampMs(session?.last_seen_at);
-  if (!tracked || !started || !lastSeen || lastSeen < started) return Math.max(0, tracked);
-  const sessionWindowSeconds = Math.max(0, Math.round((lastSeen - started) / 1000));
-  return Math.min(tracked, sessionWindowSeconds);
-}
-
-function sumBoundedActiveSeconds(sessions) {
-  return sessions.reduce((sum, session) => sum + boundedSessionActiveSeconds(session), 0);
 }
 
 function table(rows, columns) {
