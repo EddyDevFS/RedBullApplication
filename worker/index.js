@@ -203,10 +203,16 @@ async function heartbeat(request, env) {
   const body = await readJson(request);
   if (!body.sessionId || !body.token) return json({ error: "Invalid heartbeat" }, 400);
 
+  const session = await env.DB.prepare("SELECT last_seen_at FROM sessions WHERE session_id = ?")
+    .bind(body.sessionId)
+    .first();
+  const secondsSinceLastSeen = Math.max(0, Math.round((Date.now() - timestampMs(session?.last_seen_at)) / 1000));
+  const activeIncrement = Math.min(15, secondsSinceLastSeen);
+
   await env.DB.batch([
     env.DB.prepare(
-      "UPDATE sessions SET last_seen_at = CURRENT_TIMESTAMP, active_time_seconds = active_time_seconds + 15 WHERE session_id = ?",
-    ).bind(body.sessionId),
+      "UPDATE sessions SET last_seen_at = CURRENT_TIMESTAMP, active_time_seconds = active_time_seconds + ? WHERE session_id = ?",
+    ).bind(activeIncrement, body.sessionId),
     env.DB.prepare(
       "INSERT INTO events (session_id, token, event_type, section_id, event_data) VALUES (?, ?, 'heartbeat', ?, ?)",
     ).bind(body.sessionId, body.token, body.currentSection ?? null, JSON.stringify({ active: Boolean(body.active) })),
@@ -453,7 +459,7 @@ async function handleAdminSession(request, env, url) {
   const visitor = visitorLabel(session, events);
   const aggregateSession = {
     ...session,
-    active_time_seconds: tokenSessions.reduce((sum, item) => sum + (Number(item.active_time_seconds) || 0), 0),
+    active_time_seconds: sumBoundedActiveSeconds(tokenSessions),
   };
   const summary = summarizeEvents(events, aggregateSession);
   const intelligence = interpretVisitor(summary, tokenSessions);
@@ -587,7 +593,7 @@ function buildVisitorControlRows(sessions, events, links) {
         return timestampMs(session.last_seen_at) > timestampMs(latest) ? session.last_seen_at : latest;
       }, "");
       const link = group.link || {};
-      const activeSeconds = group.sessions.reduce((sum, session) => sum + (Number(session.active_time_seconds) || 0), 0);
+      const activeSeconds = sumBoundedActiveSeconds(group.sessions);
       const summary = summarizeEvents(group.events, { active_time_seconds: activeSeconds });
       const intelligence = interpretVisitor(summary, group.sessions);
       const visitor = primarySession.visitor || primarySession.name || link.name || "Anonymous visitor";
@@ -1066,6 +1072,19 @@ function parseEventData(value) {
   } catch {
     return {};
   }
+}
+
+function boundedSessionActiveSeconds(session) {
+  const tracked = Number(session?.active_time_seconds) || 0;
+  const started = timestampMs(session?.started_at);
+  const lastSeen = timestampMs(session?.last_seen_at);
+  if (!tracked || !started || !lastSeen || lastSeen < started) return Math.max(0, tracked);
+  const sessionWindowSeconds = Math.max(0, Math.round((lastSeen - started) / 1000));
+  return Math.min(tracked, sessionWindowSeconds);
+}
+
+function sumBoundedActiveSeconds(sessions) {
+  return sessions.reduce((sum, session) => sum + boundedSessionActiveSeconds(session), 0);
 }
 
 function table(rows, columns) {
