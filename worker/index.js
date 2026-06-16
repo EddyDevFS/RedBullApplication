@@ -3,6 +3,7 @@ const DOCUMENTS = {
   "wingfinder-report": "/assets/docs/eddy-sallault-wingfinder-report.pdf",
   "wingfinder-passport": "/assets/docs/eddy-sallault-wingfinder-passport.pdf",
 };
+const ADMIN_TIME_ZONE = "America/New_York";
 
 const ADMIN_CSS = `
 body{margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#f6f8fb;color:#08111f}
@@ -403,7 +404,7 @@ function renderAdmin(totals, visitors, topEvents, links, messages, generatedLink
       <div class="card"><strong>${totals.links}</strong><span>Links</span></div>
       <div class="card"><strong>${totals.sessions}</strong><span>Sessions</span></div>
       <div class="card"><strong>${totals.events}</strong><span>Events</span></div>
-      <div class="card"><strong>${Math.round(totals.active_seconds / 60)}</strong><span>Active minutes</span></div>
+      <div class="card"><strong>${Math.round(totals.active_seconds / 60)}</strong><span>Tracked active minutes</span></div>
     </section>
     <h2>Visitors - last 15 days</h2>${visitorControlTable(visitors)}
     <h2>Messages & appointments</h2>${table(messages, ["type","first_name","last_name","email","title","message","contact_method","requested_date","requested_time","requested_time_zone","contact_phone","token","created_at"])}
@@ -457,6 +458,11 @@ async function handleAdminSession(request, env, url) {
   const summary = summarizeEvents(events, aggregateSession);
   const intelligence = interpretVisitor(summary, tokenSessions);
   const linkUrl = `${url.origin}/r/${session.token}`;
+  const firstVisit = tokenSessions[tokenSessions.length - 1]?.started_at || "";
+  const lastVisit = tokenSessions.reduce((latest, item) => {
+    if (!latest) return item.last_seen_at || "";
+    return timestampMs(item.last_seen_at) > timestampMs(latest) ? item.last_seen_at : latest;
+  }, "");
 
   return html(renderAdminShell(`
     <p><a href="/admin">Back to admin</a></p>
@@ -473,7 +479,7 @@ async function handleAdminSession(request, env, url) {
       <a href="mailto:${escapeHtml(session.email ?? "")}?subject=${encodeURIComponent("Red Bull application follow-up")}">Send email</a>
     </div>
     <section class="grid">
-      <div class="card"><strong>${escapeHtml(formatDuration(summary.activeSeconds))}</strong><span>Active time on site</span></div>
+      <div class="card"><strong>${escapeHtml(formatDuration(summary.activeSeconds))}</strong><span>Tracked active time</span></div>
       <div class="card"><strong>${tokenSessions.length}</strong><span>Sessions</span></div>
       <div class="card"><strong>${intelligence.score} / 100</strong><span>Engagement score</span></div>
       <div class="card"><strong>${escapeHtml(intelligence.intent)}</strong><span>Decision intent</span></div>
@@ -503,7 +509,9 @@ async function handleAdminSession(request, env, url) {
           <div class="metric-row"><strong>Role</strong><span>${escapeHtml(session.role ?? "Unknown")}</span></div>
           <div class="metric-row"><strong>Company</strong><span>${escapeHtml(session.company ?? "Unknown")}</span></div>
           <div class="metric-row"><strong>Consent status</strong><span>${escapeHtml(session.token ? "Personalized tracked link" : "Unknown")}</span></div>
-          <div class="metric-row"><strong>First / last visit</strong><span>${escapeHtml(`${formatClock(tokenSessions[tokenSessions.length - 1]?.started_at)} - ${formatClock(tokenSessions[0]?.last_seen_at)}`)}</span></div>
+          <div class="metric-row"><strong>First / last visit</strong><span>${escapeHtml(`${formatClock(firstVisit)} - ${formatClock(lastVisit)}`)}</span></div>
+          <div class="metric-row"><strong>Visit window</strong><span>${escapeHtml(formatElapsedBetween(firstVisit, lastVisit))}</span></div>
+          <div class="metric-row"><strong>Tracked active time</strong><span>${escapeHtml(formatDuration(summary.activeSeconds))}</span></div>
           <div class="metric-row"><strong>Referrer</strong><span>${escapeHtml(session.referrer ?? "Direct")}</span></div>
         </div>
       </article>
@@ -572,6 +580,12 @@ function buildVisitorControlRows(sessions, events, links) {
   return [...groups.values()]
     .map((group) => {
       const primarySession = group.sessions[0] || {};
+      const sortedSessions = [...group.sessions].sort((a, b) => timestampMs(a.started_at) - timestampMs(b.started_at));
+      const firstStarted = sortedSessions[0]?.started_at || primarySession.started_at || "";
+      const lastSeen = sortedSessions.reduce((latest, session) => {
+        if (!latest) return session.last_seen_at || "";
+        return timestampMs(session.last_seen_at) > timestampMs(latest) ? session.last_seen_at : latest;
+      }, "");
       const link = group.link || {};
       const activeSeconds = group.sessions.reduce((sum, session) => sum + (Number(session.active_time_seconds) || 0), 0);
       const summary = summarizeEvents(group.events, { active_time_seconds: activeSeconds });
@@ -584,7 +598,9 @@ function buildVisitorControlRows(sessions, events, links) {
         token: group.token,
         sessionId: primarySession.session_id,
         visits: group.sessions.length,
-        lastVisit: primarySession.last_seen_at || link.last_opened_at || "",
+        firstStarted,
+        lastVisit: lastSeen || primarySession.last_seen_at || link.last_opened_at || "",
+        visitWindow: formatElapsedBetween(firstStarted, lastSeen || primarySession.last_seen_at),
         time: formatDuration(summary.activeSeconds),
         sections: summary.sections.length,
         documents: summary.documents.length,
@@ -601,13 +617,14 @@ function buildVisitorControlRows(sessions, events, links) {
 
 function visitorControlTable(rows) {
   if (!rows.length) return `<p class="empty">No tracked visitor yet.</p>`;
-  return `<table><thead><tr>${["Visitor","Company / role","Link","Visits","Last visit","Time","Engagement","Intent","Status"].map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${rows
+  return `<table><thead><tr>${["Visitor","Company / role","Link","Visits","First / last visit","Visit window","Tracked active","Engagement","Intent","Status"].map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${rows
     .map((row) => `<tr>
       <td>${row.sessionId ? `<a href="/admin/session?session_id=${encodeURIComponent(row.sessionId)}">${escapeHtml(row.visitor)}</a>` : escapeHtml(row.visitor)}<br><span class="subtle">${escapeHtml(`${row.sections} sections · ${row.documents} docs · ${row.articles} articles · ${row.actions} actions`)}</span></td>
       <td>${escapeHtml(row.companyRole)}</td>
       <td><code>${escapeHtml(row.token ?? "")}</code></td>
       <td>${escapeHtml(row.visits)}</td>
-      <td>${escapeHtml(formatClock(row.lastVisit))}</td>
+      <td>${escapeHtml(`${formatClock(row.firstStarted)} - ${formatClock(row.lastVisit)}`)}</td>
+      <td>${escapeHtml(row.visitWindow)}</td>
       <td>${escapeHtml(row.time)}</td>
       <td><span class="score ${escapeHtml(row.scoreLevel)}"><span class="score-dot"></span>${escapeHtml(row.score)} / 100</span></td>
       <td>${escapeHtml(row.intent)}</td>
@@ -625,8 +642,8 @@ function connectionsTable(rows) {
         <td><a href="/admin/session?session_id=${encodeURIComponent(row.session_id)}">${escapeHtml(visitor)}</a></td>
         <td><code>${escapeHtml(row.token ?? "")}</code></td>
         <td>${escapeHtml(origin)}</td>
-        <td>${escapeHtml(row.started_at ?? "")}</td>
-        <td>${escapeHtml(row.last_seen_at ?? "")}</td>
+        <td>${escapeHtml(formatClock(row.started_at))}</td>
+        <td>${escapeHtml(formatClock(row.last_seen_at))}</td>
         <td>${escapeHtml(row.active_time_seconds ?? 0)}s</td>
         <td>${escapeHtml(row.device_type ?? "")}</td>
         <td>${escapeHtml(row.browser ?? "")}</td>
@@ -961,7 +978,16 @@ function readableSection(value) {
 }
 
 function eventMs(event) {
-  const timestamp = Date.parse(event.created_at || "");
+  const timestamp = timestampMs(event.created_at || "");
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function timestampMs(value) {
+  if (!value) return 0;
+  const normalized = typeof value === "string" && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(value)
+    ? `${value.replace(" ", "T")}Z`
+    : value;
+  const timestamp = Date.parse(normalized);
   return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
@@ -976,15 +1002,24 @@ function formatDuration(seconds) {
 
 function formatClock(value) {
   if (!value) return "";
-  const date = new Date(value);
+  const date = new Date(timestampMs(value));
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString("en-US", {
+    timeZone: ADMIN_TIME_ZONE,
     month: "short",
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
+    timeZoneName: "short",
   });
+}
+
+function formatElapsedBetween(startValue, endValue) {
+  const start = timestampMs(startValue);
+  const end = timestampMs(endValue);
+  if (!start || !end || end < start) return "Unknown";
+  return formatDuration(Math.round((end - start) / 1000));
 }
 
 function renderTimelineEvent(event) {
