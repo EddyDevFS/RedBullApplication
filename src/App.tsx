@@ -525,7 +525,7 @@ function App() {
       </header>
 
       <main id="top">
-        <Hero setModal={setModal} />
+        <Hero />
         <CansIntro />
         <WingfinderPack
           openedForces={openedForces}
@@ -549,7 +549,7 @@ function App() {
   );
 }
 
-function Hero({ setModal }: { setModal: (modal: ModalState) => void }) {
+function Hero() {
   return (
     <section className="hero section" id="experience" data-track-section="hero">
       <div className="hero-bg" data-parallax>
@@ -562,28 +562,6 @@ function Hero({ setModal }: { setModal: (modal: ModalState) => void }) {
           I am Eddy Sallault. I built this application the way I work: with energy,
           structure, creativity, field proof, and a clear sense of execution.
         </p>
-        <div className="hero-actions">
-          <button
-            className="button primary"
-            onClick={() => scrollToId("cans")}
-            data-track-click="cta_click"
-            data-track-id="enter-experience"
-            data-track-label="Enter the experience"
-          >
-            <Play size={18} />
-            Enter the experience
-          </button>
-          <button
-            className="button ghost"
-            onClick={() => setModal({ type: "documents" })}
-            data-track-click="document_click"
-            data-track-id="view-classic-documents"
-            data-track-label="View classic documents"
-          >
-            <FileText size={18} />
-            View classic documents
-          </button>
-        </div>
       </div>
       <button
         className="scroll-cue"
