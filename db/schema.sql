@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS sessions (
   country TEXT,
   region TEXT,
   referrer TEXT,
+  visitor_key TEXT,
   user_agent_hash TEXT,
   tracking_consent INTEGER DEFAULT 1,
   FOREIGN KEY(token) REFERENCES links(token)

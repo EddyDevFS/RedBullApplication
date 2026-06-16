@@ -4,6 +4,7 @@ const DOCUMENTS = {
   "wingfinder-passport": "/assets/docs/eddy-sallault-wingfinder-passport.pdf",
 };
 const ADMIN_TIME_ZONE = "America/New_York";
+const PUBLIC_TOKEN = "RB-PUBLIC";
 
 const ADMIN_CSS = `
 body{margin:0;font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#f6f8fb;color:#08111f}
@@ -14,6 +15,7 @@ p{color:#5d6b7c}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))
 .card{padding:18px}.card strong{display:block;font-size:2rem}.card span{color:#5d6b7c;font-weight:700}
 table{width:100%;border-collapse:collapse;overflow:hidden}th,td{padding:12px;border-bottom:1px solid rgba(8,17,31,.08);text-align:left;font-size:.9rem;vertical-align:top}
 th{background:#08111f;color:white}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.inline-form{margin:0}.danger-button{border:1px solid rgba(155,38,52,.25);background:#fff2f4;color:#9b2634;border-radius:999px;padding:8px 11px;font-weight:900;cursor:pointer}.danger-button:hover{background:#ffe7eb}
 .admin-form{display:grid;gap:14px;margin:28px 0;padding:18px}.admin-form h2{margin:0}.admin-form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.admin-form label{display:grid;gap:6px;color:#082b66;font-size:.74rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.admin-form input{min-height:42px;padding:9px 11px;border:1px solid rgba(8,17,31,.14);border-radius:6px;font:inherit}.admin-form button{min-height:42px;align-self:end;border:0;border-radius:999px;background:#082b66;color:white;font-weight:900;cursor:pointer}.generated-link{padding:14px 16px;margin:14px 0;background:#eef8f2;border-color:rgba(16,166,106,.28)}.generated-link input{width:100%;margin-top:8px;padding:10px;border:1px solid rgba(16,166,106,.35);border-radius:6px;font:inherit}.timeline{display:grid;gap:10px}.timeline-item{padding:14px 16px;background:white;border:1px solid rgba(8,17,31,.1);border-radius:8px;box-shadow:0 8px 24px rgba(8,17,31,.06)}.timeline-item strong{display:block}.timeline-item small{color:#5d6b7c}.timeline-item pre{white-space:pre-wrap;word-break:break-word;background:#f6f8fb;border-radius:6px;padding:10px;max-height:220px;overflow:auto}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2f7;color:#082b66;font-size:.74rem;font-weight:900}
 .insight-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin:24px 0}.insight-card{background:white;border:1px solid rgba(8,17,31,.1);border-radius:8px;box-shadow:0 12px 32px rgba(8,17,31,.08);padding:18px}.insight-card h2,.insight-card h3{margin:0 0 12px}.metric-list{display:grid;gap:10px}.metric-row{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;padding:10px 0;border-bottom:1px solid rgba(8,17,31,.08)}.metric-row:last-child{border-bottom:0}.metric-row strong{font-size:1rem}.metric-row span{color:#5d6b7c}.metric-value{font-weight:900;color:#08111f;white-space:nowrap}.section-bar{height:8px;background:#e8eef6;border-radius:999px;overflow:hidden;margin-top:7px}.section-bar span{display:block;height:100%;background:#0f4ea8;border-radius:999px}.empty{padding:18px;background:white;border:1px dashed rgba(8,17,31,.2);border-radius:8px;color:#5d6b7c}.details{margin-top:28px}.details summary{cursor:pointer;font-weight:900;color:#082b66;margin-bottom:12px}.action-table td:first-child{white-space:nowrap;color:#5d6b7c}.subtle{color:#5d6b7c}.kicker{font-weight:900;color:#082b66;text-transform:uppercase;letter-spacing:.08em}
 .score{display:inline-flex;align-items:center;gap:8px;font-weight:900}.score-dot{width:10px;height:10px;border-radius:999px;background:#d1d8e2}.score.high .score-dot{background:#16a66a}.score.medium .score-dot{background:#f5b330}.score.low .score-dot{background:#df3f40}.status{display:inline-block;padding:5px 9px;border-radius:999px;background:#eef2f7;color:#082b66;font-size:.78rem;font-weight:900}.status.high{background:#eef8f2;color:#087246}.status.medium{background:#fff9ea;color:#8a5a00}.status.low{background:#f6eef0;color:#9b2634}.journey-map{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;margin:18px 0}.journey-step{min-height:112px;padding:12px;border-radius:8px;border:1px solid rgba(8,17,31,.12);background:white}.journey-step strong{display:block;font-size:.82rem}.journey-step small{display:block;margin-top:7px;color:#5d6b7c}.journey-step.ignored{opacity:.55}.journey-step.viewed{border-color:#f5b330;background:#fff9ea}.journey-step.engaged{border-color:#16a66a;background:#eef8f2}.journey-step.strong{border-color:#0f4ea8;background:#eef5ff}.story{display:grid;gap:12px}.story details{background:white;border:1px solid rgba(8,17,31,.1);border-radius:8px;box-shadow:0 8px 24px rgba(8,17,31,.06);padding:14px 16px}.story summary{cursor:pointer;font-weight:900}.story ol{margin:12px 0 0;padding-left:22px;color:#08111f}.story li{margin:7px 0}.summary-card{background:#08111f;color:white;border-radius:8px;padding:20px;margin:24px 0;box-shadow:0 16px 36px rgba(8,17,31,.18)}.summary-card p{color:#d8e2ef}.summary-card strong{color:white}.admin-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.admin-actions a,.admin-actions button{border:1px solid rgba(8,17,31,.16);background:white;border-radius:999px;padding:9px 13px;font-weight:900;color:#082b66;cursor:pointer}
@@ -43,6 +45,10 @@ export default {
       return handleAdminSession(request, env, url);
     }
 
+    if (url.pathname === "/admin/reset") {
+      return handleAdminReset(request, env);
+    }
+
     if (url.pathname === "/admin") {
       return handleAdmin(request, env);
     }
@@ -63,8 +69,8 @@ export default {
     if (url.pathname === "/redbull") {
       const trackingOff = url.searchParams.get("tracking") === "off";
       return serveApp(request, env, {
-        enabled: !trackingOff && Boolean(url.searchParams.get("t")),
-        token: trackingOff ? null : url.searchParams.get("t"),
+        enabled: !trackingOff,
+        token: trackingOff ? null : (url.searchParams.get("t") || PUBLIC_TOKEN),
         canonicalPath: "/redbull",
       });
     }
@@ -78,7 +84,11 @@ async function serveApp(request, env, tracking) {
     const link = await env.DB.prepare("SELECT token, tracking_enabled FROM links WHERE token = ?")
       .bind(tracking.token)
       .first();
-    if (!link && String(tracking.token).startsWith("RB-SHARE-")) {
+    if (!link && tracking.token === PUBLIC_TOKEN) {
+      await env.DB.prepare(
+        "INSERT OR IGNORE INTO links (token, campaign, tracking_enabled, status) VALUES (?, 'public-redbull-application', 1, 'public')",
+      ).bind(PUBLIC_TOKEN).run();
+    } else if (!link && String(tracking.token).startsWith("RB-SHARE-")) {
       const url = new URL(request.url);
       await env.DB.prepare(
         "INSERT OR IGNORE INTO links (token, campaign, parent_token, tracking_enabled, status) VALUES (?, 'redbull-application', ?, 1, 'shared')",
@@ -143,13 +153,14 @@ async function startSession(request, env) {
   const parsed = parseUserAgent(userAgent);
   const cf = request.cf ?? {};
   const referrer = request.headers.get("Referer") ?? "";
+  const visitorKey = await visitorKeyHash(request, userAgent);
 
   await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO sessions (
         session_id, token, visitor_id, last_seen_at, page_views, device_type, browser, os,
-        country, region, referrer, user_agent_hash, tracking_consent
-      ) VALUES (?, ?, ?, CURRENT_TIMESTAMP, 1, ?, ?, ?, ?, ?, ?, ?, 1)`,
+        country, region, referrer, visitor_key, user_agent_hash, tracking_consent
+      ) VALUES (?, ?, ?, CURRENT_TIMESTAMP, 1, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
     ).bind(
       sessionId,
       token,
@@ -160,6 +171,7 @@ async function startSession(request, env) {
       cf.country ?? null,
       cf.region ?? null,
       referrer,
+      visitorKey,
       await sha256(userAgent),
     ),
     env.DB.prepare(
@@ -304,6 +316,7 @@ async function handleAdmin(request, env) {
   }
 
   const createdToken = new URL(request.url).searchParams.get("created");
+  const resetToken = new URL(request.url).searchParams.get("reset");
   if (createdToken) {
     generatedLink = await env.DB.prepare(
       `SELECT l.token, c.name, c.role, c.email
@@ -331,7 +344,8 @@ async function handleAdmin(request, env) {
           'Anonymous visitor'
         ) AS visitor,
         s.session_id, s.started_at, s.last_seen_at,
-        s.active_time_seconds, s.page_views, s.device_type, s.browser, s.os, s.country, s.region, s.referrer
+        s.active_time_seconds, s.page_views, s.device_type, s.browser, s.os, s.country, s.region, s.referrer,
+        s.visitor_id, s.visitor_key, s.user_agent_hash
        FROM sessions s
        LEFT JOIN links l ON l.token = s.token
        LEFT JOIN contacts c ON c.id = l.contact_id
@@ -379,7 +393,32 @@ async function handleAdmin(request, env) {
 
   const visitors = buildVisitorControlRows(recentSessions.results, recentEvents.results, links.results);
 
-  return html(renderAdmin(totals, visitors, topEvents.results, links.results, messages.results, generatedLink, new URL(request.url).origin));
+  return html(renderAdmin(totals, visitors, topEvents.results, links.results, messages.results, generatedLink, resetToken, new URL(request.url).origin));
+}
+
+async function handleAdminReset(request, env) {
+  const unauthorized = requireAdmin(request, env);
+  if (unauthorized) return unauthorized;
+  if (request.method !== "POST") return new Response("Method not allowed.", { status: 405 });
+
+  const form = await request.formData();
+  const token = String(form.get("token") ?? "").trim();
+  if (!token) return Response.redirect(`${new URL(request.url).origin}/admin`, 303);
+
+  const link = await env.DB.prepare("SELECT token, parent_token, status FROM links WHERE token = ?")
+    .bind(token)
+    .first();
+  if (!link) return Response.redirect(`${new URL(request.url).origin}/admin`, 303);
+
+  const resetStatus = token === PUBLIC_TOKEN ? "public" : link.parent_token ? "shared" : "created";
+  await env.DB.batch([
+    env.DB.prepare("DELETE FROM events WHERE token = ?").bind(token),
+    env.DB.prepare("DELETE FROM messages WHERE token = ?").bind(token),
+    env.DB.prepare("DELETE FROM sessions WHERE token = ?").bind(token),
+    env.DB.prepare("UPDATE links SET last_opened_at = NULL, status = ? WHERE token = ?").bind(resetStatus, token),
+  ]);
+
+  return Response.redirect(`${new URL(request.url).origin}/admin?reset=${encodeURIComponent(token)}`, 303);
 }
 
 async function createRecipientLink(request, env) {
@@ -404,12 +443,13 @@ async function createRecipientLink(request, env) {
   return { token, name, role, email };
 }
 
-function renderAdmin(totals, visitors, topEvents, links, messages, generatedLink, origin) {
+function renderAdmin(totals, visitors, topEvents, links, messages, generatedLink, resetToken, origin) {
   const recalculatedActiveSeconds = visitors.reduce((sum, visitor) => sum + (Number(visitor.activeSeconds) || 0), 0);
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Red Bull Tracking Admin</title><style>${ADMIN_CSS}</style></head><body><main>
     <h1>Visitor Control Tower</h1>
     <p>Behavior intelligence for the Red Bull application. Engagement only, no invasive fingerprinting.</p>
     ${generatedLink ? renderGeneratedLink(generatedLink, origin) : ""}
+    ${resetToken ? `<section class="generated-link"><strong>Tracking reset for <code>${escapeHtml(resetToken)}</code></strong><p>Sessions, events and messages were cleared. The link is still available.</p></section>` : ""}
     ${renderCreateRecipientForm()}
     <section class="grid">
       <div class="card"><strong>${totals.links}</strong><span>Links</span></div>
@@ -571,18 +611,35 @@ function renderAdminShell(content) {
 function buildVisitorControlRows(sessions, events, links) {
   const linkMap = new Map(links.map((link) => [link.token, link]));
   const groups = new Map();
+  const sessionGroupMap = new Map();
 
   sessions.forEach((session) => {
     const token = session.token || session.session_id;
-    if (!groups.has(token)) groups.set(token, { token, sessions: [], events: [], link: linkMap.get(token) });
-    groups.get(token).sessions.push(session);
+    const key = visitorGroupKey(session);
+    if (!groups.has(key)) groups.set(key, { key, token, visitorKey: key.split("::")[1] || "", sessions: [], events: [], link: linkMap.get(token) });
+    groups.get(key).sessions.push(session);
+    if (session.session_id) sessionGroupMap.set(session.session_id, key);
   });
 
   events.forEach((event) => {
     const token = event.token || event.session_id;
-    if (!groups.has(token)) groups.set(token, { token, sessions: [], events: [], link: linkMap.get(token) });
-    groups.get(token).events.push(event);
+    const key = event.session_id ? sessionGroupMap.get(event.session_id) : null;
+    const fallbackKey = `${token}::legacy`;
+    const groupKey = key || fallbackKey;
+    if (!groups.has(groupKey)) groups.set(groupKey, { key: groupKey, token, visitorKey: "legacy", sessions: [], events: [], link: linkMap.get(token) });
+    groups.get(groupKey).events.push(event);
   });
+
+  const tokenPrimaryVisitorKey = new Map();
+  [...groups.values()]
+    .filter((group) => group.sessions.length)
+    .sort((a, b) => groupFirstStartedMs(a) - groupFirstStartedMs(b))
+    .forEach((group) => {
+      if (!tokenPrimaryVisitorKey.has(group.token)) tokenPrimaryVisitorKey.set(group.token, group.visitorKey);
+    });
+
+  const publicCounters = new Map();
+  const secondaryCounters = new Map();
 
   return [...groups.values()]
     .map((group) => {
@@ -596,10 +653,12 @@ function buildVisitorControlRows(sessions, events, links) {
       const link = group.link || {};
       const summary = summarizeEvents(group.events, { sessions: group.sessions });
       const intelligence = interpretVisitor(summary, group.sessions);
-      const visitor = primarySession.visitor || primarySession.name || link.name || "Anonymous visitor";
+      const category = visitorCategory(group, link, tokenPrimaryVisitorKey);
+      const visitor = visitorDisplayName(group, primarySession, link, category, publicCounters, secondaryCounters);
       const companyRole = [primarySession.company || link.company, primarySession.role || link.role].filter(Boolean).join(" / ") || "Unknown role";
       return {
         visitor,
+        category: category.label,
         companyRole,
         token: group.token,
         sessionId: primarySession.session_id,
@@ -624,9 +683,10 @@ function buildVisitorControlRows(sessions, events, links) {
 
 function visitorControlTable(rows) {
   if (!rows.length) return `<p class="empty">No tracked visitor yet.</p>`;
-  return `<table><thead><tr>${["Visitor","Company / role","Link","Visits","First / last visit","Visit window","Tracked active","Engagement","Intent","Status"].map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${rows
+  return `<table><thead><tr>${["Visitor","Category","Company / role","Link","Visits","First / last visit","Visit window","Tracked active","Engagement","Intent","Status","Reset"].map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead><tbody>${rows
     .map((row) => `<tr>
       <td>${row.sessionId ? `<a href="/admin/session?session_id=${encodeURIComponent(row.sessionId)}">${escapeHtml(row.visitor)}</a>` : escapeHtml(row.visitor)}<br><span class="subtle">${escapeHtml(`${row.sections} sections · ${row.documents} docs · ${row.articles} articles · ${row.actions} actions`)}</span></td>
+      <td><span class="badge">${escapeHtml(row.category)}</span></td>
       <td>${escapeHtml(row.companyRole)}</td>
       <td><code>${escapeHtml(row.token ?? "")}</code></td>
       <td>${escapeHtml(row.visits)}</td>
@@ -636,8 +696,54 @@ function visitorControlTable(rows) {
       <td><span class="score ${escapeHtml(row.scoreLevel)}"><span class="score-dot"></span>${escapeHtml(row.score)} / 100</span></td>
       <td>${escapeHtml(row.intent)}</td>
       <td><span class="status ${escapeHtml(row.scoreLevel)}">${escapeHtml(row.status)}</span></td>
+      <td>${resetTokenForm(row.token)}</td>
     </tr>`)
     .join("")}</tbody></table>`;
+}
+
+function visitorGroupKey(session) {
+  const token = session.token || "unknown";
+  const visitorKey = session.visitor_key || session.visitor_id || session.user_agent_hash || session.session_id || "unknown";
+  return `${token}::${visitorKey}`;
+}
+
+function groupFirstStartedMs(group) {
+  const timestamps = group.sessions.map((session) => timestampMs(session.started_at)).filter(Boolean);
+  return timestamps.length ? Math.min(...timestamps) : 0;
+}
+
+function visitorCategory(group, link, tokenPrimaryVisitorKey) {
+  if (group.token === PUBLIC_TOKEN) return { type: "public", label: "Visitor without link" };
+  if (link?.parent_token || String(group.token || "").startsWith("RB-SHARE-")) return { type: "shared", label: "Shared link visitor" };
+  if (group.visitorKey && tokenPrimaryVisitorKey.get(group.token) && group.visitorKey !== tokenPrimaryVisitorKey.get(group.token)) {
+    return { type: "secondary", label: `Visitor of ${link?.name || "recipient"}` };
+  }
+  return { type: "recipient", label: "Named recipient" };
+}
+
+function visitorDisplayName(group, primarySession, link, category, publicCounters, secondaryCounters) {
+  if (category.type === "public") {
+    const next = (publicCounters.get(group.token) || 0) + 1;
+    publicCounters.set(group.token, next);
+    return `Visitor without link ${next}`;
+  }
+
+  if (category.type === "secondary") {
+    const next = (secondaryCounters.get(group.token) || 0) + 1;
+    secondaryCounters.set(group.token, next);
+    return `Visitor of ${link?.name || "recipient"} ${next}`;
+  }
+
+  if (category.type === "shared") return primarySession.visitor || primarySession.name || "Shared link visitor";
+  return primarySession.visitor || primarySession.name || link?.name || "Anonymous visitor";
+}
+
+function resetTokenForm(token) {
+  if (!token) return "";
+  return `<form class="inline-form" method="post" action="/admin/reset" onsubmit="return confirm('Reset all tracking data for ${escapeAttr(token)}? The link will remain available.');">
+    <input type="hidden" name="token" value="${escapeAttr(token)}">
+    <button class="danger-button" type="submit">Reset data</button>
+  </form>`;
 }
 
 function connectionsTable(rows) {
@@ -1250,6 +1356,14 @@ async function sha256(value) {
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+async function visitorKeyHash(request, userAgent) {
+  const ip =
+    request.headers.get("CF-Connecting-IP") ||
+    request.headers.get("X-Forwarded-For")?.split(",")[0]?.trim() ||
+    "";
+  return sha256(`${ip}|${userAgent || ""}`);
+}
+
 function randomCode(length) {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const bytes = crypto.getRandomValues(new Uint8Array(length));
@@ -1262,4 +1376,8 @@ function escapeHtml(value) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replaceAll("'", "&#39;");
 }
