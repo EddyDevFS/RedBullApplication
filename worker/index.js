@@ -375,7 +375,7 @@ async function handleAdmin(request, env) {
        LEFT JOIN links pl ON pl.token = l.parent_token
        LEFT JOIN contacts pc ON pc.id = pl.contact_id
        ORDER BY l.created_at DESC
-       LIMIT 40`,
+       LIMIT 200`,
     ).all(),
     env.DB.prepare(
       `SELECT type, first_name, last_name, email, title, message, token,
@@ -611,35 +611,22 @@ function renderAdminShell(content) {
 function buildVisitorControlRows(sessions, events, links) {
   const linkMap = new Map(links.map((link) => [link.token, link]));
   const groups = new Map();
-  const sessionGroupMap = new Map();
+  const sessionTokenMap = new Map();
 
   sessions.forEach((session) => {
     const token = session.token || session.session_id;
-    const key = visitorGroupKey(session);
-    if (!groups.has(key)) groups.set(key, { key, token, visitorKey: key.split("::")[1] || "", sessions: [], events: [], link: linkMap.get(token) });
-    groups.get(key).sessions.push(session);
-    if (session.session_id) sessionGroupMap.set(session.session_id, key);
+    if (!groups.has(token)) groups.set(token, { token, sessions: [], events: [], link: linkMap.get(token) });
+    groups.get(token).sessions.push(session);
+    if (session.session_id) sessionTokenMap.set(session.session_id, token);
   });
 
   events.forEach((event) => {
     const token = event.token || event.session_id;
-    const key = event.session_id ? sessionGroupMap.get(event.session_id) : null;
-    const fallbackKey = `${token}::legacy`;
-    const groupKey = key || fallbackKey;
-    if (!groups.has(groupKey)) groups.set(groupKey, { key: groupKey, token, visitorKey: "legacy", sessions: [], events: [], link: linkMap.get(token) });
-    groups.get(groupKey).events.push(event);
+    const groupToken = event.session_id ? sessionTokenMap.get(event.session_id) : null;
+    const resolvedToken = groupToken || token;
+    if (!groups.has(resolvedToken)) groups.set(resolvedToken, { token: resolvedToken, sessions: [], events: [], link: linkMap.get(resolvedToken) });
+    groups.get(resolvedToken).events.push(event);
   });
-
-  const tokenPrimaryVisitorKey = new Map();
-  [...groups.values()]
-    .filter((group) => group.sessions.length)
-    .sort((a, b) => groupFirstStartedMs(a) - groupFirstStartedMs(b))
-    .forEach((group) => {
-      if (!tokenPrimaryVisitorKey.has(group.token)) tokenPrimaryVisitorKey.set(group.token, group.visitorKey);
-    });
-
-  const publicCounters = new Map();
-  const secondaryCounters = new Map();
 
   return [...groups.values()]
     .map((group) => {
@@ -653,12 +640,12 @@ function buildVisitorControlRows(sessions, events, links) {
       const link = group.link || {};
       const summary = summarizeEvents(group.events, { sessions: group.sessions });
       const intelligence = interpretVisitor(summary, group.sessions);
-      const category = visitorCategory(group, link, tokenPrimaryVisitorKey);
-      const visitor = visitorDisplayName(group, primarySession, link, category, publicCounters, secondaryCounters);
-      const companyRole = [primarySession.company || link.company, primarySession.role || link.role].filter(Boolean).join(" / ") || "Unknown role";
+      const category = tokenCategory(group.token, link);
+      const visitor = visitorDisplayNameForToken(group, primarySession, link, category);
+      const companyRole = [link.company || primarySession.company, link.role || primarySession.role].filter(Boolean).join(" / ") || "Unknown role";
       return {
         visitor,
-        category: category.label,
+        category,
         companyRole,
         token: group.token,
         sessionId: primarySession.session_id,
@@ -678,7 +665,7 @@ function buildVisitorControlRows(sessions, events, links) {
         status: intelligence.status,
       };
     })
-    .sort((a, b) => b.score - a.score || Date.parse(b.lastVisit || 0) - Date.parse(a.lastVisit || 0));
+    .sort((a, b) => timestampMs(b.lastVisit || "") - timestampMs(a.lastVisit || "") || b.score - a.score);
 }
 
 function visitorControlTable(rows) {
@@ -701,41 +688,18 @@ function visitorControlTable(rows) {
     .join("")}</tbody></table>`;
 }
 
-function visitorGroupKey(session) {
-  const token = session.token || "unknown";
-  const visitorKey = session.visitor_key || session.visitor_id || session.user_agent_hash || session.session_id || "unknown";
-  return `${token}::${visitorKey}`;
+function tokenCategory(token, link) {
+  if (token === PUBLIC_TOKEN) return "Visitors without link";
+  if (link?.parent_token || String(token || "").startsWith("RB-SHARE-")) return "Shared link";
+  return "Named recipient";
 }
 
-function groupFirstStartedMs(group) {
-  const timestamps = group.sessions.map((session) => timestampMs(session.started_at)).filter(Boolean);
-  return timestamps.length ? Math.min(...timestamps) : 0;
-}
-
-function visitorCategory(group, link, tokenPrimaryVisitorKey) {
-  if (group.token === PUBLIC_TOKEN) return { type: "public", label: "Visitor without link" };
-  if (link?.parent_token || String(group.token || "").startsWith("RB-SHARE-")) return { type: "shared", label: "Shared link visitor" };
-  if (group.visitorKey && tokenPrimaryVisitorKey.get(group.token) && group.visitorKey !== tokenPrimaryVisitorKey.get(group.token)) {
-    return { type: "secondary", label: `Visitor of ${link?.name || "recipient"}` };
-  }
-  return { type: "recipient", label: "Named recipient" };
-}
-
-function visitorDisplayName(group, primarySession, link, category, publicCounters, secondaryCounters) {
-  if (category.type === "public") {
-    const next = (publicCounters.get(group.token) || 0) + 1;
-    publicCounters.set(group.token, next);
-    return `Visitor without link ${next}`;
-  }
-
-  if (category.type === "secondary") {
-    const next = (secondaryCounters.get(group.token) || 0) + 1;
-    secondaryCounters.set(group.token, next);
-    return `Visitor of ${link?.name || "recipient"} ${next}`;
-  }
-
-  if (category.type === "shared") return primarySession.visitor || primarySession.name || "Shared link visitor";
-  return primarySession.visitor || primarySession.name || link?.name || "Anonymous visitor";
+function visitorDisplayNameForToken(group, primarySession, link, category) {
+  if (group.token === PUBLIC_TOKEN) return "Visitors without link";
+  if (link?.name) return link.name;
+  if (link?.parent_name) return `Shared from ${link.parent_name}`;
+  if (category === "Shared link") return primarySession.visitor || primarySession.name || "Shared link visitor";
+  return primarySession.visitor || primarySession.name || "Anonymous visitor";
 }
 
 function resetTokenForm(token) {
@@ -1140,13 +1104,32 @@ function renderSessionStories(sessions, events) {
     .map((session, index) => {
       const sessionEvents = events.filter((event) => event.session_id === session.session_id);
       const summary = summarizeEvents(sessionEvents, session);
+      const category = sessionCategory(session, summary);
       const storyItems = buildSessionStory(sessionEvents, summary);
       return `<details ${index === 0 ? "open" : ""}>
-        <summary>Session ${String(sessions.length - index).padStart(2, "0")} - ${escapeHtml(formatClock(session.started_at))} - ${escapeHtml(formatDuration(summary.activeSeconds))}</summary>
+        <summary>Session ${String(sessions.length - index).padStart(2, "0")} - ${escapeHtml(formatClock(session.started_at))} - ${escapeHtml(formatDuration(summary.activeSeconds))} <span class="badge">${escapeHtml(category)}</span></summary>
         <ol>${storyItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ol>
       </details>`;
     })
     .join("")}</section>`;
+}
+
+function sessionCategory(session, summary) {
+  const referrer = String(session.referrer || "").toLowerCase();
+  const browser = String(session.browser || "").toLowerCase();
+  const device = String(session.device_type || "").toLowerCase();
+  if (referrer.includes("linkedin.com")) return "LinkedIn preview / referral";
+  if (
+    summary.activeSeconds <= 45 &&
+    summary.actions.length === 0 &&
+    summary.articleOpenCount === 0 &&
+    summary.documents.length === 0 &&
+    summary.sections.length <= 1
+  ) {
+    return "Likely preview / noise";
+  }
+  if (browser === "unknown" || device === "bot") return "Technical open";
+  return "Human session";
 }
 
 function buildSessionStory(events, summary) {
